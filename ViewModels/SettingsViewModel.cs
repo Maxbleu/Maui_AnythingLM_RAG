@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using MauiApp_IA_IOT.Util;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
 {
@@ -9,11 +11,11 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 
         private Brush _colorAnyThingLM = Brush.Red;
         private string _protocol = "http";
-        private string _host = "localhost";
-        private string _port = "3000";
+        private string _host = "";
+        private string _port = "3001";
         private string _apiKey = "";
 
-        private bool _isEnabledButton = false;
+        private bool _isEnabledButton = true;
         private bool _isAnyThingLMRunning = false;
 
         public Brush ColorAnyThingLM
@@ -64,6 +66,18 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 }
             }
         }
+        public string ApiKey
+        {
+            get => this._apiKey;
+            set
+            {
+                if (this._apiKey != value)
+                {
+                    this._apiKey = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public bool IsEnabledButton
         {
             get => this._isEnabledButton;
@@ -88,7 +102,65 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 }
 
                 this.ColorAnyThingLM = this.IsAnyThingLMRunning ? Brush.Green : Brush.Red;
+                this.IsEnabledButton = this.IsAnyThingLMRunning ? false : true;
             }
+        }
+
+        public Command ReloadConfigurationCommand { get; set; }
+
+        public SettingsViewModel()
+        {
+            this.ReloadConfigurationCommand = new Command(ReloadConfigurationAsync);
+
+            this.LoadAnyThingLMAsync();
+        }
+
+        /// <summary>
+        /// Este método realiza una llamada al método de recarga
+        /// de la conexión con la api de AnyThingLLM
+        /// </summary>
+        public async void ReloadConfigurationAsync()
+        {
+            await this.LoadAnyThingLMAsync();
+        }
+        /// <summary>
+        /// Este método se encarga de cargar
+        /// la conexión con la api de AnyThingLLM
+        /// </summary>
+        /// <returns></returns>
+        public async Task LoadAnyThingLMAsync()
+        {
+            using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.ApiKey);
+                try
+                {
+                    string url = ThingsUtils.GetUrl(this.Protocol, this.Host, this.Port, "/api/v1/auth");
+                    var response = await client.GetAsync(url);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        NotifyResponseRequestNodeRed("Se conectado con AnyThingLM", false, true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    NotifyResponseRequestNodeRed("Error comunicándose con AnyThingLM: " + ex.Message, true, false);
+                }
+            }
+        }
+        /// <summary>
+        /// Este método se encarga de notificar cualquier 
+        /// cambio que surja en el servicio durante la
+        /// ejecucción de la aplicación.
+        /// </summary>
+        /// <param name="mensajeSnakBar"></param>
+        /// <param name="isEnabledButton"></param>
+        /// <param name="isAnyThingServiceRunning"></param>
+        private void NotifyResponseRequestNodeRed(string mensajeSnakBar, bool isEnabledButton, bool isAnyThingServiceRunning)
+        {
+            ThingsUtils.SendSnakbarMessage(mensajeSnakBar);
+            this.IsEnabledButton = isEnabledButton;
+            this.IsAnyThingLMRunning = isAnyThingServiceRunning;
         }
 
         #region INotifyPropertyChanged

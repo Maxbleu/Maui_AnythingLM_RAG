@@ -1,4 +1,5 @@
-﻿
+﻿using CommunityToolkit.Maui.Alerts;
+
 namespace MauiApp_IA_IOT.Util
 {
     public class ThingsUtils

@@ -9,8 +9,8 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     public class ChatViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        private SettingsViewModel _settingsViewModel;
 
+        private SettingsViewModel _settingsViewModel;
         private string _newMessageText;
 
         public ObservableCollection<Message> Messages { get; set; }
@@ -40,8 +40,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         /// <summary>
         /// Este método se encarga de enviar
         /// el mensaje escrito por el usuario
-        /// al modelo para que infiera que tool
-        /// ejecutar.
+        /// al modelo
         /// </summary>
         private async void SendUserMessageAsync()
         {
@@ -54,7 +53,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                     IsCurrentUser = true
                 }
             );
-            await this._settingsViewModel.SendMessageToLLMAsync(this.NewMessageText);
+            //await this._settingsViewModel.SendMessageToLLMAsync(this.NewMessageText);
         }
 
         #region INotifyPropertyChanged

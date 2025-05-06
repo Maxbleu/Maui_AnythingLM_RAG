@@ -4,27 +4,31 @@
              xmlns:Shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls"
              x:Class="MauiApp_AnyThingLM_RAG.Views.SettingsPage">
 
-    <Grid Margin="15">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0" Margin="15">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Label Grid.Column="0"
-                       Text="Settings AnyThingLM" 
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                       Text="Settings AnythingLM" 
                        FontSize="20" 
                        FontAttributes="Bold"/>
 
-            <Shapes:Ellipse 
+                <Shapes:Ellipse 
                         Grid.Column="1"
                         WidthRequest="50" 
                         HeightRequest="50" 
@@ -33,48 +37,48 @@
                         StrokeThickness="10"
                         HorizontalOptions="End"/>
 
-        </Grid>
-        <Grid Grid.Row="1" Margin="0,20,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <Label Text="Url" FontSize="16" Grid.Row="0" Grid.ColumnSpan="3"/>
-
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="5*" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-
-                <Entry Grid.Column="0" Text="{Binding Protocol}"
-                       Placeholder="http" 
-                       FontSize="16"/>
-
-                <Entry Grid.Column="1" Text="{Binding HostName}"
-                       Placeholder="Hostname" 
-                       FontSize="16"/>
-
-                <Entry Grid.Column="2" Text="{Binding Port}"
-                       Placeholder="Port" 
-                       FontSize="16"/>
             </Grid>
+            <Grid Grid.Row="1" Margin="0,20,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Text="Url" FontSize="16" Grid.Row="0" Grid.ColumnSpan="3"/>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="4*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Entry Grid.Column="0" Text="{Binding Protocol}"
+                            Placeholder="http" 
+                            FontSize="16"/>
+
+                    <Entry Grid.Column="1" Text="{Binding Host}"
+                            Placeholder="localhost" 
+                            FontSize="16"/>
+
+                    <Entry Grid.Column="2" Text="{Binding Port}"
+                            Placeholder="port" 
+                            FontSize="16"/>
+
+                    <Button Grid.Column="3"
+                        ImageSource="refresh.svg"
+                        Command="{Binding ReloadConfigurationCommand}"
+                        IsEnabled="{Binding IsEnabledButton}"/>
+                </Grid>
+            </Grid>
+            <StackLayout Grid.Row="2" Margin="0,20,0,0">
+                <Entry Grid.Column="2" Text="{Binding ApiKey}"
+                    IsPassword="True"
+                    Placeholder="Put your API KEY" 
+                    FontSize="16"/>
+            </StackLayout>
+
         </Grid>
-        <StackLayout Grid.Row="2" Margin="0,20,0,0">
-            <Label Text="Api Key" FontSize="16"/>
-            <Entry Grid.Row="1" Text="{Binding ApiKey}"
-                   Placeholder="Api Key" 
-                   FontSize="16"
-                   IsPassword="True"/>
-        </StackLayout>
-        <Button Grid.Row="3"
-                Text="Guardar"
-                Margin="0,20,0,0"
-                Command="{Binding SaveConfigurationCommand}"
-                IsEnabled="{Binding IsEnabledButton}"/>
-
     </Grid>
-
 </ContentPage>
