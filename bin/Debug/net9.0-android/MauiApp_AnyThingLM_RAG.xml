@@ -4,11 +4,38 @@
         <name>MauiApp_AnyThingLM_RAG</name>
     </assembly>
     <members>
-        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.SendUserMessageAsync">
+        <member name="M:MauiApp_AnyThingLM_RAG.Utils.GuiUtils.SendSnakbarMessage(System.String)">
+            <summary>
+            Este método se encarga de mostrar mensajes
+            a partir del Sankbar
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.ShowReferencesMetaDocument(System.Object)">
+            <summary>
+            Este método se encarga de mostrar las referencias
+            que ha encontrado el modelo en el documento para
+            realizar el mensaje que ha recibido el usuario
+            </summary>
+            <param name="sender"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.SendMessageAsync">
             <summary>
             Este método se encarga de enviar
             el mensaje escrito por el usuario
             al modelo
+            </summary>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.UploadDocumentAsync">
+            <summary>
+            Este método se encarga de enviar un documento
+            al workspace seleccionado por el usuario a AnyThingLLM
+            </summary>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.ShowWorkspaceDocumentsAsync">
+            <summary>
+            Este método se encarga de mostrar los documentos
+            registras en el workspace seleccionado por el usuario
             </summary>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.SettingsViewModel.ReloadConfigurationAsync">
@@ -17,12 +44,11 @@
             de la conexión con la api de AnyThingLLM
             </summary>
         </member>
-        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.SettingsViewModel.LoadAnyThingLMAsync">
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.SettingsViewModel.TryConnectionAsync">
             <summary>
             Este método se encarga de cargar
             la conexión con la api de AnyThingLLM
             </summary>
-            <returns></returns>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.SettingsViewModel.NotifyResponseRequestNodeRed(System.String,System.Boolean,System.Boolean)">
             <summary>
@@ -40,21 +66,22 @@
             Exposes the Android Resource designer assembly into the project Namespace.
             </summary>
         </member>
-        <member name="M:MauiApp_IA_IOT.Util.ThingsUtils.SendSnakbarMessage(System.String)">
+        <member name="M:MauiApp_IA_IOT.Util.UrlUtils.GetBaseUrl(System.String,System.String,System.String,System.String)">
             <summary>
-            Este método se encarga de mostrar mensajes
-            a partir del Sankbar
-            </summary>
-            <param name="message"></param>
-        </member>
-        <member name="M:MauiApp_IA_IOT.Util.ThingsUtils.GetUrl(System.String,System.String,System.String,System.String)">
-            <summary>
-            Este método se encarga de volver una url resultado
+            Este método se encarga de volver la base url resultado
             de la concatenación de los string que recibe por parámtro
             </summary>
             <param name="protocol"></param>
             <param name="ip"></param>
             <param name="port"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_IA_IOT.Util.UrlUtils.GetFullUrl(System.String,System.String)">
+            <summary>
+            Este método se encarga de volver la url completa resultado
+            de la concatenación de los string que recibe por parámtro
+            </summary>
+            <param name="baseUrl"></param>
             <param name="path"></param>
             <returns></returns>
         </member>

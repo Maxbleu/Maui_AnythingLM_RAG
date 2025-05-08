@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:views\\settingspage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\viewmodels\\settingsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:viewmodels\\settingsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\views\\chatpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:views\\chatpage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     }
   ],
   "DocumentGroupContainers": [
@@ -17,37 +13,20 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "DockedWidth": 240,
+          "SelectedChildIndex": 0,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "SettingsPage.xaml",
-              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Views\\SettingsPage.xaml",
-              "RelativeDocumentMoniker": "Views\\SettingsPage.xaml",
-              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Views\\SettingsPage.xaml",
-              "RelativeToolTip": "Views\\SettingsPage.xaml",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAAE0AAAAxAAAAAAAAAA==",
+              "Title": "ChatPage.xaml",
+              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Views\\ChatPage.xaml",
+              "RelativeDocumentMoniker": "Views\\ChatPage.xaml",
+              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Views\\ChatPage.xaml",
+              "RelativeToolTip": "Views\\ChatPage.xaml",
+              "ViewState": "AgIAABsAAAAAAAAAAAAAAD4AAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-05-06T11:14:14.694Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SettingsViewModel.cs",
-              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\ViewModels\\SettingsViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModels\\SettingsViewModel.cs",
-              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\ViewModels\\SettingsViewModel.cs",
-              "RelativeToolTip": "ViewModels\\SettingsViewModel.cs",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAkwIUAAAAVAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-05T21:05:24.843Z",
+              "WhenOpened": "2025-05-08T11:40:01.178Z",
               "EditorCaption": ""
             }
           ]

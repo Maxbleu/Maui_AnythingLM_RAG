@@ -4,7 +4,25 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:MauiApp_AnyThingLM_RAG.Views"
+    FlyoutBehavior="Flyout"
+    Shell.NavBarIsVisible="False"
+    FlyoutWidth="250"
     Title="MauiApp_AnyThingLM_RAG">
+
+    <Shell.FlyoutHeader>
+        <Grid BackgroundColor="#512BD4" HeightRequest="200">
+            <Image Source="dotnet_bot.png" 
+                   HeightRequest="100" 
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+            <Label Text="AnyThingLM RAG" 
+                   TextColor="White"
+                   FontSize="24"
+                   HorizontalOptions="Center"
+                   VerticalOptions="End"
+                   Margin="0,0,0,20"/>
+        </Grid>
+    </Shell.FlyoutHeader>
 
     <TabBar>
         <Tab Title="Chat" Icon="chat.svg">

@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using MauiApp_AnyThingLM_RAG.Factory;
+using MauiApp_AnyThingLM_RAG.Managers;
+using MauiApp_AnyThingLM_RAG.Utils;
 using MauiApp_IA_IOT.Util;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
@@ -8,12 +11,14 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     public class SettingsViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        private AnyThingLLManager _anyThingLLManager;
 
         private Brush _colorAnyThingLM = Brush.Red;
         private string _protocol = "http";
-        private string _host = "";
+        private string _host = "172.17.48.1";
         private string _port = "3001";
-        private string _apiKey = "";
+        private string _apiKey = "KPS4Q3R-Q5M4PYM-Q5ZCGZE-W8DYYCN";
+        private string _baseUrl = "";
 
         private bool _isEnabledButton = true;
         private bool _isAnyThingLMRunning = false;
@@ -78,6 +83,19 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 }
             }
         }
+        public string BaseUrl
+        {
+            get
+            {
+                string baseUrl = UrlUtils.GetBaseUrl(this.Protocol, this.Host, this.Port, "/api/v1");
+                if (baseUrl != this._baseUrl)
+                {
+                    this._baseUrl = baseUrl;
+                    OnPropertyChanged();
+                }
+                return this._baseUrl;
+            }
+        }
         public bool IsEnabledButton
         {
             get => this._isEnabledButton;
@@ -105,6 +123,18 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 this.IsEnabledButton = this.IsAnyThingLMRunning ? false : true;
             }
         }
+        public AnyThingLLManager AnyThingLLManager
+        {
+            get => this._anyThingLLManager;
+            set
+            {
+                if (this._anyThingLLManager != value)
+                {
+                    this._anyThingLLManager = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public Command ReloadConfigurationCommand { get; set; }
 
@@ -112,7 +142,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         {
             this.ReloadConfigurationCommand = new Command(ReloadConfigurationAsync);
 
-            this.LoadAnyThingLMAsync();
+            this.TryConnectionAsync();
         }
 
         /// <summary>
@@ -121,24 +151,24 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         /// </summary>
         public async void ReloadConfigurationAsync()
         {
-            await this.LoadAnyThingLMAsync();
+            await this.TryConnectionAsync();
         }
         /// <summary>
         /// Este método se encarga de cargar
         /// la conexión con la api de AnyThingLLM
         /// </summary>
-        /// <returns></returns>
-        public async Task LoadAnyThingLMAsync()
+        public async Task TryConnectionAsync()
         {
             using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.ApiKey);
                 try
                 {
-                    string url = ThingsUtils.GetUrl(this.Protocol, this.Host, this.Port, "/api/v1/auth");
+                    string url = UrlUtils.GetFullUrl(this.BaseUrl, "/auth");
                     var response = await client.GetAsync(url);
                     if (response.IsSuccessStatusCode)
                     {
+                        this.AnyThingLLManager = AnyThingLLManagerFactory.Create(this.BaseUrl, this.ApiKey);
                         NotifyResponseRequestNodeRed("Se conectado con AnyThingLM", false, true);
                     }
                 }
@@ -156,9 +186,9 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         /// <param name="mensajeSnakBar"></param>
         /// <param name="isEnabledButton"></param>
         /// <param name="isAnyThingServiceRunning"></param>
-        private void NotifyResponseRequestNodeRed(string mensajeSnakBar, bool isEnabledButton, bool isAnyThingServiceRunning)
+        public void NotifyResponseRequestNodeRed(string mensajeSnakBar, bool isEnabledButton, bool isAnyThingServiceRunning)
         {
-            ThingsUtils.SendSnakbarMessage(mensajeSnakBar);
+            GuiUtils.SendSnakbarMessage(mensajeSnakBar);
             this.IsEnabledButton = isEnabledButton;
             this.IsAnyThingLMRunning = isAnyThingServiceRunning;
         }

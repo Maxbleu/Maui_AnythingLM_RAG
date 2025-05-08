@@ -2,6 +2,7 @@
 using MauiApp_AnyThingLM_RAG.Views;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
+using MauiApp_AnyThingLM_RAG.Managers;
 
 namespace MauiApp_AnyThingLM_RAG
 {
@@ -15,6 +16,8 @@ namespace MauiApp_AnyThingLM_RAG
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             }).UseMauiCommunityToolkit();
+
+            builder.Services.AddSingleton<AnyThingLLManager>();
 
             builder.Services.AddSingleton<SettingsViewModel>();
             builder.Services.AddSingleton<SettingsPage>();
