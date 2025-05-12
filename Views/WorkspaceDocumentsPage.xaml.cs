@@ -8,5 +8,5 @@ public partial class WorkspaceDocumentsPage : ContentPage
 	{
 		InitializeComponent();
 		this.BindingContext = workspaceDocumentsViewModel;
-    }
+	}
 }

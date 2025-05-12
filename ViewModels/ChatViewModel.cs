@@ -14,15 +14,17 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private AnyThingLLManager _anyThingLLManager;
-        private SettingsViewModel _settingsViewModel;
+
         private ChatPage _chatPage;
 
         private string _newMessageText = "";
         private string _chatMode = "Chat";
-        private string _slug = "my-workspace";
+        private string _slug;
+        private string _theardName;
 
         public ObservableCollection<dynamic> Messages { get; set; }
         public Dictionary<string, List<string>> References { get; set; }
+
         public string NewMessageText
         {
             get => _newMessageText;
@@ -31,6 +33,18 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 if (_newMessageText != value)
                 {
                     _newMessageText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string ThreadName
+        {
+            get => this._theardName;
+            set
+            {
+                if(this._theardName != value)
+                {
+                    this._theardName = value;
                     OnPropertyChanged();
                 }
             }
@@ -60,30 +74,26 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             }
         }
 
-        public ICommand ShowReferencesMetaDocumentCommand { get; set; }
-        public ICommand ShowWorkspaceDocumentsCommand { get; set; }
-        public ICommand SendMessageCommand { get; set; }
-        public ICommand UploadDocumentCommand { get; set; }
-        public ChatViewModel()
+        public ICommand NavigateToWorkspaceDocumentsCommand { get; }
+        public ICommand ShowReferencesMetaDocumentCommand { get; }
+        public ICommand DeleteThreadCommand { get; }
+        public ICommand SendMessageCommand { get; }
+        
+        public ChatViewModel(string threadName, string slug)
         {
+            this.Slug = slug;
+            this.ThreadName = threadName;
+
             this.SendMessageCommand = new Command(SendMessageAsync);
-            this.UploadDocumentCommand = new Command(UploadDocumentAsync);
-            this.ShowWorkspaceDocumentsCommand = new Command(ShowWorkspaceDocumentsAsync);
+            this.DeleteThreadCommand = new Command(DeleteThreadAsync);
             this.ShowReferencesMetaDocumentCommand = new Command(ShowReferencesMetaDocument);
+            this.NavigateToWorkspaceDocumentsCommand = new Command(NavigateToWorkspaceDocumentsAsync);
+
             this.Messages = new ObservableCollection<dynamic>();
 
-            this._settingsViewModel = IPlatformApplication.Current.Services.GetService<SettingsViewModel>();
-            this._settingsViewModel.PropertyChanged += _settingsViewModel_PropertyChanged;
+            this._anyThingLLManager = IPlatformApplication.Current.Services.GetService<SettingsViewModel>().AnyThingLLManager;
         }
-
-        //  EVENTOS SUBSCRITOS
-        private void _settingsViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(SettingsViewModel.AnyThingLLManager))
-            {
-                this._anyThingLLManager = this._settingsViewModel.AnyThingLLManager;
-            }
-        }
+        public ChatViewModel() { }
 
         /// <summary>
         /// Este método se encarga de mostrar las referencias
@@ -139,53 +149,35 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             this.NewMessageText = String.Empty;
         }
         /// <summary>
-        /// Este método se encarga de enviar un documento
-        /// al workspace seleccionado por el usuario a AnyThingLLM
+        /// Este método se encarga de obtener, 
+        /// los documentos y mostrarlos en la pantalla
         /// </summary>
-        private async void UploadDocumentAsync()
+        private async void NavigateToWorkspaceDocumentsAsync()
         {
-            string message = "";
-            dynamic objResult = await this._anyThingLLManager.TakeDocumentAsync(this.Slug);
-            if(objResult.GetType().GetProperty("Response") != null)
-            {
-                message = objResult.Response.Message;
-            }
-            else
-            {
-                message = objResult.Error.Message;
-            }
-            GuiUtils.SendSnakbarMessage(message);
-        }
-        /// <summary>
-        /// Este método se encarga de mostrar los documentos
-        /// registras en el workspace seleccionado por el usuario
-        /// </summary>
-        private async void ShowWorkspaceDocumentsAsync()
-        {
-            //  Obtener los documentos del workspace
             dynamic objResult = await this._anyThingLLManager.TakeWorkspaceDocumentsAsync(this.Slug);
 
-            //  Comprobar si se ha producido un error
-            if(objResult.GetType().GetProperty("Data") != null)
+            if (objResult.GetType().GetProperty("Data") != null)
             {
-                ObservableCollection<string> documents = new ObservableCollection<string>((List<string>)objResult.Data);
-
-                //  Creamos el view model de la vista
-                WorkspaceDocumentsViewModel workspaceDocumentsViewModel = WorkspaceDocumentsViewModelFactory.Create(this.Slug, documents);
-
-                //  Creamos la vista
-                WorkspaceDocumentsPage workspaceDocumentsPage = WorkspaceDocumentsPageFactory.Create(workspaceDocumentsViewModel);
-
-                //  Navegamos a la vista
-                await Shell.Current.Navigation.PushAsync(workspaceDocumentsPage);
+                WorkspaceDocumentsViewModel workspaceDocumentsViewModel = WorkspaceDocumentsViewModelFactory.Create(objResult.Data, this.Slug);
+                await Shell.Current.Navigation.PushAsync(WorkspaceDocumentsPageFactory.Create(workspaceDocumentsViewModel));
             }
             else
             {
-                string errorMessage = objResult.Error.Message;
-                GuiUtils.SendSnakbarMessage(errorMessage);
+                GuiUtils.SendSnakbarMessage(objResult.Error.ToString());
             }
+        }
+        /// <summary>
+        /// Este método se encargará de eliminar
+        /// un thread registrado en el workspace
+        /// </summary>
+        private async void DeleteThreadAsync()
+        {
+            bool wantDeleteChat = await GuiUtils.DisplayAlertAsync(Shell.Current as Page, "Eliminación de thread", $"¿Desea eliminar este el chat {this.ThreadName}?", "Sí", "No");
 
-
+            if (wantDeleteChat)
+            {
+                //  Eliminar thread
+            }
         }
 
         #region INotifyPropertyChanged

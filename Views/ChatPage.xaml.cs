@@ -10,5 +10,4 @@ namespace MauiApp_AnyThingLM_RAG.Views
             this.BindingContext = chatViewModel;
         }
     }
-
 }

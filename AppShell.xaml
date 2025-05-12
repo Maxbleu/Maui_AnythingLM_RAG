@@ -11,26 +11,51 @@
 
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="#512BD4" HeightRequest="200">
-            <Image Source="dotnet_bot.png" 
-                   HeightRequest="100" 
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"/>
-            <Label Text="AnyThingLM RAG" 
-                   TextColor="White"
-                   FontSize="24"
-                   HorizontalOptions="Center"
-                   VerticalOptions="End"
-                   Margin="0,0,0,20"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Padding="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                
+                <StackLayout Grid.Row="0" HorizontalOptions="End">
+                    <Image
+                        Source="settings_white.svg"
+                        WidthRequest="30"
+                        HeightRequest="30"
+                        Aspect="AspectFit">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding NavigateToSettingsCommand}" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </StackLayout>
+
+                <Image Grid.Row="1"
+                       Source="dotnet_bot.png" 
+                       HeightRequest="100" 
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+
+                <Label Grid.Row="2"
+                       Text="AnyThingLM RAG" 
+                       TextColor="White"
+                       FontSize="24"
+                       HorizontalOptions="Start"
+                       VerticalOptions="End"
+                       Margin="0,0,0,20"/>
+            </Grid>
+            
+            
         </Grid>
     </Shell.FlyoutHeader>
 
-    <TabBar>
-        <Tab Title="Chat" Icon="chat.svg">
-            <ShellContent ContentTemplate="{DataTemplate views:ChatPage}" />
-        </Tab>
-        <Tab Title="Settings" Icon="settings.svg">
-            <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}" />
-        </Tab>
-    </TabBar>
-    
+    <ShellContent Title="Home" ContentTemplate="{DataTemplate views:HomePage}"/>
+
+    <FlyoutItem x:Name="Workspaces" Title="Workspaces"></FlyoutItem>
+
 </Shell>

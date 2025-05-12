@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using MauiApp_AnyThingLM_RAG.Factory;
 using MauiApp_AnyThingLM_RAG.Managers;
 using MauiApp_AnyThingLM_RAG.Utils;
@@ -15,9 +16,9 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 
         private Brush _colorAnyThingLM = Brush.Red;
         private string _protocol = "http";
-        private string _host = "172.17.48.1";
+        private string _host = "";
         private string _port = "3001";
-        private string _apiKey = "KPS4Q3R-Q5M4PYM-Q5ZCGZE-W8DYYCN";
+        private string _apiKey = "";
         private string _baseUrl = "";
 
         private bool _isEnabledButton = true;
@@ -136,13 +137,13 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             }
         }
 
-        public Command ReloadConfigurationCommand { get; set; }
+        public ICommand ReloadConfigurationCommand { get; }
+        public ICommand GoBackCommand { get; }
 
         public SettingsViewModel()
         {
             this.ReloadConfigurationCommand = new Command(ReloadConfigurationAsync);
-
-            this.TryConnectionAsync();
+            this.GoBackCommand = new Command(GuiUtils.GoBackAsync);
         }
 
         /// <summary>
@@ -159,6 +160,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         /// </summary>
         public async Task TryConnectionAsync()
         {
+            if (this.AnyThingLLManager != null) return;
             using (HttpClient client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.ApiKey);

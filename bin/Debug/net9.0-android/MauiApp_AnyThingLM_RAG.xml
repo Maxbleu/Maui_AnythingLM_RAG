@@ -11,6 +11,27 @@
             </summary>
             <param name="message"></param>
         </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Utils.GuiUtils.GoBackAsync">
+            <summary>
+            Este método se encarga de 
+            volver a la página anterior
+            en la que se encontraba el usuario
+            </summary>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Utils.GuiUtils.DisplayAlertAsync(Microsoft.Maui.Controls.Page,System.String,System.String,System.String,System.String)">
+            <summary>
+            Este método se encarga de mostrar en una
+            página en específico una alerta y
+            dependiendo de lo que elija el usuario
+            se devolverá un true o false
+            </summary>
+            <param name="page"></param>
+            <param name="titulo"></param>
+            <param name="message"></param>
+            <param name="textOkButton"></param>
+            <param name="textCancelButton"></param>
+            <returns></returns>
+        </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.ShowReferencesMetaDocument(System.Object)">
             <summary>
             Este método se encarga de mostrar las referencias
@@ -26,16 +47,10 @@
             al modelo
             </summary>
         </member>
-        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.UploadDocumentAsync">
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.NavigateToWorkspaceDocumentsAsync">
             <summary>
-            Este método se encarga de enviar un documento
-            al workspace seleccionado por el usuario a AnyThingLLM
-            </summary>
-        </member>
-        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.ShowWorkspaceDocumentsAsync">
-            <summary>
-            Este método se encarga de mostrar los documentos
-            registras en el workspace seleccionado por el usuario
+            Este método se encarga de obtener, 
+            los documentos y mostrarlos en la pantalla
             </summary>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.SettingsViewModel.ReloadConfigurationAsync">
@@ -59,6 +74,12 @@
             <param name="mensajeSnakBar"></param>
             <param name="isEnabledButton"></param>
             <param name="isAnyThingServiceRunning"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.WorkspaceDocumentsViewModel.UploadDocumentAsync">
+            <summary>
+            Este método se encarga de enviar un documento
+            al workspace seleccionado por el usuario a AnyThingLLM
+            </summary>
         </member>
         <member name="T:MauiApp_AnyThingLM_RAG.Resource">
             <summary>

@@ -1,6 +1,8 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using MauiApp_AnyThingLM_RAG.Models;
+using MauiApp_AnyThingLM_RAG.Utils;
 using Newtonsoft.Json;
 
 namespace MauiApp_AnyThingLM_RAG.Managers
@@ -9,6 +11,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
     {
         private string _baseUrl;
         private string _apiKey;
+
+        public WorkspaceRoot WorkspaceRoot { get; set; }
 
         public AnyThingLLManager(string baseUrl, string apiKey)
         {
@@ -323,7 +327,24 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             if (response.IsSuccessStatusCode)
             {
                 string responseContent = await response.Content.ReadAsStringAsync();
-                List<string> documents = StringDocumentsToList(responseContent);
+
+                string contentFormatted = responseContent.Substring(0, 11) + $"s\":" + responseContent.Substring(12 + 1);
+
+                //  Obtenemos los datos del workspace
+                this.WorkspaceRoot = JsonConvert.DeserializeObject<WorkspaceRoot>(contentFormatted);
+
+                //  Obtenemos la lista de documentos
+                List<Metadata> documents = new List<Metadata>();
+                foreach(Document doc in this.WorkspaceRoot.Workspaces[0].Documents)
+                {
+                    //  Obtenemos los metadatos del documento
+                    var metadata = JsonConvert.DeserializeObject<Metadata>(doc.Metadata);
+
+                    //  Añadimos el documento a la lista
+                    documents.Add(metadata);
+                }
+
+                //  Guardamos el resultado
                 result = new
                 {
                     Data = documents
@@ -341,10 +362,258 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             }
             return result;
         }
-        private List<string> StringDocumentsToList(string documents)
+    
+        //  WORKSPACES
+        public async Task<WorkspaceRoot> GetAllWorkSpaces()
         {
-            List<string> listDocuments = new List<string>();
-            return listDocuments;
+            List<Workspace> workspaces = new List<Workspace>();
+            try
+            {
+                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
+                {
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+
+                    string uri = $"{this._baseUrl}/workspaces";
+                    HttpResponseMessage response = await client.GetAsync(uri);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        this.WorkspaceRoot = JsonConvert.DeserializeObject<WorkspaceRoot>(responseContent);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                GuiUtils.SendSnakbarMessage(ex.Message);
+            }
+
+            return this.WorkspaceRoot;
+        }
+        public async Task<dynamic> GetChatsWorkspace(string slug)
+        {
+            dynamic objResult = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+
+                    HttpResponseMessage response = await client.GetAsync($"{_baseUrl}/workspace/{slug}/chats");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string responseContent = await response.Content.ReadAsStringAsync();
+                        var responseJson = JsonConvert.DeserializeObject<dynamic>(responseContent);
+                        objResult = new
+                        {
+                            Data = responseJson
+                        };
+                    }
+                    else
+                    {
+                        objResult = new
+                        {
+                            Error = new
+                            {
+                                Message = "No se ha podido obtener respuesta"
+                            }
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objResult = new
+                {
+                    Error = new
+                    {
+                        Message = ex.Message
+                    }
+                };
+            }
+
+            return objResult;
+        }
+        public async Task<dynamic> CreateNewWorkspace(string slug)
+        {
+            dynamic objResult = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+
+                    var payload = new
+                    {
+                        name = slug,
+                        similarityThreshold = 0.7,
+                        openAiTemp = 0.7,
+                        openAiHistory = 20,
+                        openAiPrompt = "Custom prompt for responses",
+                        queryRefusalResponse = "Custom refusal message",
+                        chatMode = "chat",
+                        topN = 4
+                    };
+
+                    string jsonPayload = JsonConvert.SerializeObject(payload);
+                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                    HttpResponseMessage response = await client.PostAsync($"{_baseUrl}/workspace/new", content);
+                    if (response.IsSuccessStatusCode)
+                        objResult = new
+                        {
+                            Data = "Se ha creado el workspace"
+                        };
+                    else
+                    {
+                        objResult = new
+                        {
+                            Error = new
+                            {
+                                Message = "No se ha podido obtener respuesta"
+                            }
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objResult = new
+                {
+                    Error = new
+                    {
+                        Message = ex.Message
+                    }
+                };
+            }
+
+            return objResult;
+        }
+        public async Task<dynamic> DeleteWorkspace(string slug)
+        {
+            dynamic objResult = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+
+                    HttpResponseMessage response = await client.DeleteAsync($"{this._baseUrl}/workspace/{slug}");
+                    if (response.IsSuccessStatusCode)
+                        objResult = new
+                        {
+                            Data = "Se ha eliminado el workspace"
+                        };
+                    else
+                    {
+                        objResult = new
+                        {
+                            Error = new
+                            {
+                                Message = "No se ha podido obtener respuesta"
+                            }
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objResult = new
+                {
+                    Error = new
+                    {
+                        Message = ex.Message
+                    }
+                };
+            }
+
+            return objResult;
+        }
+
+        //  THREAD
+        public async Task<dynamic> CreateNewThread(string slug)
+        {
+            dynamic objResult = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+
+                    HttpResponseMessage response = await client.GetAsync($"{_baseUrl}/workspace/{slug}/thread/new");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        objResult = new
+                        {
+                            Data = "Se ha creado el hilo correctamente"
+                        };
+                    }
+                    else
+                    {
+                        objResult = new
+                        {
+                            Error = new
+                            {
+                                Message = "No se ha podido obtener respuesta"
+                            }
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objResult = new
+                {
+                    Error = new
+                    {
+                        Message = ex.Message
+                    }
+                };
+            }
+
+            return objResult;
+        }
+        public async Task<dynamic> DeleteThread(string slug, string threadSlug)
+        {
+            dynamic objResult = null;
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+
+                    HttpResponseMessage response = await client.DeleteAsync($"{_baseUrl}/workspace/{slug}/thread/{threadSlug}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        objResult = new
+                        {
+                            Data = "Se ha eliminado el hilo correctamente"
+                        };
+                    }
+                    else
+                    {
+                        objResult = new
+                        {
+                            Error = new
+                            {
+                                Message = "No se ha podido obtener respuesta"
+                            }
+                        };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objResult = new
+                {
+                    Error = new
+                    {
+                        Message = ex.Message
+                    }
+                };
+            }
+
+            return objResult;
         }
     }
 }

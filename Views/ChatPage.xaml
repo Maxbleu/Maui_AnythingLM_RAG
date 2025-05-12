@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maui="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:viewModels="clr-namespace:MauiApp_AnyThingLM_RAG.ViewModels"
+             xmlns:views="clr-namespace:MauiApp_AnyThingLM_RAG.Views"
              x:Class="MauiApp_AnyThingLM_RAG.Views.ChatPage">
 
     <Grid BackgroundColor="#F5F5F5">
@@ -20,12 +22,12 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" 
-                       Text="AnythingLM" 
-                       Margin="12,0,0,0"
-                       VerticalOptions="Center" 
-                       FontSize="20"
-                       TextColor="Black"
-                       FontAttributes="Bold"/>
+                    Text="{Binding ThreadName}" 
+                    Margin="12,0,0,0"
+                    VerticalOptions="Center" 
+                    FontSize="20"
+                    TextColor="Black"
+                    FontAttributes="Bold"/>
 
                 <Grid Grid.Column="1">
                     <Grid.ColumnDefinitions>
@@ -35,13 +37,13 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Grid.Column="0" Text="{Binding ChatMode}" 
-                           FontSize="16" FontAttributes="Bold"
-                           VerticalOptions="Center"
-                           Margin="10,0,0,0" TextColor="Black">
+                        FontSize="16" FontAttributes="Bold"
+                        VerticalOptions="Center"
+                        Margin="10,0,0,0" TextColor="Black">
                         <Label.Triggers>
                             <DataTrigger TargetType="Label"
-                                         Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
-                                         Value="true">  
+                                        Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
+                                        Value="true">
                                 <Setter Property="Text" Value="Query" />
                             </DataTrigger>
                         </Label.Triggers>
@@ -49,27 +51,27 @@
                     <Switch Grid.Column="1" x:Name="chatModeSwitch" OnColor="MediumSpringGreen">
                         <Switch.Triggers>
                             <DataTrigger TargetType="Switch" 
-                                         Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
-                                         Value="True">
+                                        Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
+                                        Value="True">
                                 <Setter Property="ThumbColor" Value="MediumSpringGreen" />
                             </DataTrigger>
                             <DataTrigger TargetType="Switch" 
-                                         Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
-                                         Value="False">
+                                        Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
+                                        Value="False">
                                 <Setter Property="ThumbColor" Value="Red" />
                             </DataTrigger>
                         </Switch.Triggers>
                     </Switch>
                     <Button Grid.Column="2" x:Name="workspaceDocuments" 
-                            Command="{Binding ShowWorkspaceDocumentsCommand}"
-                            HeightRequest="50" VerticalOptions="Center" 
-                            HorizontalOptions="End" ImageSource="workspace_documents.svg"/>
+                        HeightRequest="50" VerticalOptions="Center" 
+                        HorizontalOptions="End" ImageSource="delete.svg"
+                        Command="{Binding DeleteThreadCommand}"/>
                 </Grid>
 
             </Grid>
         </Border>
 
-        <CollectionView Grid.Row="1" BackgroundColor="#F5F5F5" Margin="16" ItemsSource="{Binding Messages}" ItemsUpdatingScrollMode="KeepLastItemInView">
+        <CollectionView x:Name="ListMessages" Grid.Row="1" BackgroundColor="#F5F5F5" Margin="16" ItemsSource="{Binding Messages}" ItemsUpdatingScrollMode="KeepLastItemInView">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <StackLayout Margin="0,4">
@@ -99,14 +101,21 @@
                                 </Label.Style>
                             </Label>
                         </Frame>
-                        <CollectionView ItemsSource="{Binding Keys}" ItemsLayout="VerticalList" >
+                        <CollectionView ItemsSource="{Binding Keys}" ItemsLayout="VerticalList">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Button Text="{Binding}" BackgroundColor="#007AFF"
-                                            TextColor="White" HorizontalOptions="Start" 
-                                            CornerRadius="30" FontSize="10" HeightRequest="35"
-                                            Margin="0,3,0,0" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ChatViewModel}}, Path=ShowReferencesMetaDocumentCommand}"
-                                            CommandParameter="{Binding}"/>
+                                    <Frame BackgroundColor="#007AFF" CornerRadius="30"
+                                            HeightRequest="35" Padding="12,0" HasShadow="False" 
+                                            HorizontalOptions="Start" Margin="0,3,0,0">
+                                        <Label Text="{Binding}" TextColor="White" 
+                                                FontSize="10" VerticalOptions="Center"
+                                                HorizontalOptions="Center">
+                                            <Label.GestureRecognizers>
+                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ChatViewModel}}, Path=ShowReferencesMetaDocumentCommand}"
+                                                    CommandParameter="{Binding}" />
+                                            </Label.GestureRecognizers>
+                                        </Label>
+                                    </Frame>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
@@ -114,7 +123,7 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-        
+
         <Grid Grid.Row="2" BackgroundColor="White" Padding="15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -123,20 +132,20 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" x:Name="SendDocument" 
-                    Command="{Binding UploadDocumentCommand}"
-                    HeightRequest="50" VerticalOptions="Center" 
-                    HorizontalOptions="End" ImageSource="upload_file.svg"/>
-            
+                Command="{Binding NavigateToWorkspaceDocumentsCommand}"
+                HeightRequest="50" VerticalOptions="Center" 
+                HorizontalOptions="End" ImageSource="workspace_documents.svg"/>
+
             <Editor Grid.Column="1" x:Name="MessageEditor"
-                    Text="{Binding NewMessageText, Mode=TwoWay}"
-                    Placeholder="Escribe un mensaje..."
-                    BackgroundColor="#F5F5F5" TextColor="Black" 
-                    FontSize="16" HeightRequest="50" Margin="8,0,8,0"/>
+                Text="{Binding NewMessageText, Mode=TwoWay}"
+                Placeholder="Escribe un mensaje..."
+                BackgroundColor="#F5F5F5" TextColor="Black" 
+                FontSize="16" HeightRequest="50" Margin="8,0,8,0"/>
 
             <Button Grid.Column="2" x:Name="SendButton" 
-                    Command="{Binding SendMessageCommand}"
-                    HeightRequest="50" VerticalOptions="Center" 
-                    HorizontalOptions="End" ImageSource="send_message.svg"/>
+                Command="{Binding SendMessageCommand}"
+                HeightRequest="50" VerticalOptions="Center" 
+                HorizontalOptions="End" ImageSource="send_message.svg"/>
         </Grid>
 
     </Grid>

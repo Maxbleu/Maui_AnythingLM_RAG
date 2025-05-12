@@ -1,4 +1,7 @@
-﻿namespace MauiApp_AnyThingLM_RAG
+﻿using MauiApp_AnyThingLM_RAG.Factory;
+using MauiApp_AnyThingLM_RAG.ViewModels;
+
+namespace MauiApp_AnyThingLM_RAG
 {
     public partial class App : Application
     {
@@ -9,7 +12,9 @@
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            AppShell appShell = IPlatformApplication.Current.Services.GetService<AppShell>();
+            AppShellViewModel appShellViewModel = IPlatformApplication.Current.Services.GetService<AppShellViewModel>();
+            AppShell appShell = AppShellFactory.Create(appShellViewModel);
+
             return new Window(appShell);
         }
     }

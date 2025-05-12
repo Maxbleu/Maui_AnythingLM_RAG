@@ -17,15 +17,15 @@ namespace MauiApp_AnyThingLM_RAG
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             }).UseMauiCommunityToolkit();
 
-            builder.Services.AddSingleton<AnyThingLLManager>();
-
             builder.Services.AddSingleton<SettingsViewModel>();
             builder.Services.AddSingleton<SettingsPage>();
 
-            builder.Services.AddSingleton<ChatViewModel>();
-            builder.Services.AddSingleton<ChatPage>();
+            builder.Services.AddTransient<ChatViewModel>();
+            builder.Services.AddTransient<ChatPage>();
+
+            builder.Services.AddSingleton<HomePage>();
             
-            builder.Services.AddSingleton<AppShell>();
+            builder.Services.AddSingleton<AppShellViewModel>();
 #if DEBUG
             builder.Logging.AddDebug();
 #endif

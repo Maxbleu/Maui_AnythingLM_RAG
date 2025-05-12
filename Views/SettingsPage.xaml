@@ -15,18 +15,43 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" 
+                    ImageSource="back.svg" 
+                    HeightRequest="44"
+                    WidthRequest="44"
+                    Padding="0"
+                    BorderWidth="1"
+                    VerticalOptions="Center"
+                    Command="{Binding GoBackCommand}"/>
+
+                <Label Grid.Column="1"
+                       Text="Settings" 
+                       FontSize="20" 
+                       Margin="10,0,0,0"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"/>
+
+            </Grid>
+            <Grid Grid.Row="1" Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0"
-                       Text="Settings AnythingLM" 
+                       Text="AnythingLLM Service" 
                        FontSize="20" 
-                       FontAttributes="Bold"/>
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"/>
 
                 <Shapes:Ellipse 
                         Grid.Column="1"
@@ -38,7 +63,7 @@
                         HorizontalOptions="End"/>
 
             </Grid>
-            <Grid Grid.Row="1" Margin="0,20,0,0">
+            <Grid Grid.Row="2" Margin="0,20,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -72,7 +97,7 @@
                         IsEnabled="{Binding IsEnabledButton}"/>
                 </Grid>
             </Grid>
-            <StackLayout Grid.Row="2" Margin="0,20,0,0">
+            <StackLayout Grid.Row="3" Margin="0,20,0,0">
                 <Entry Grid.Column="2" Text="{Binding ApiKey}"
                     IsPassword="True"
                     Placeholder="Put your API KEY" 
