@@ -64,8 +64,8 @@
                     </Switch>
                     <Button Grid.Column="2" x:Name="workspaceDocuments" 
                         HeightRequest="50" VerticalOptions="Center" 
-                        HorizontalOptions="End" ImageSource="delete.svg"
-                        Command="{Binding DeleteThreadCommand}"/>
+                        HorizontalOptions="End" ImageSource="settings_white.svg"
+                        Command="{Binding NavigateToChatSettingsCommand}"/>
                 </Grid>
 
             </Grid>

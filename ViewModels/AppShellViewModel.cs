@@ -1,8 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using MauiApp_AnyThingLM_RAG.Factory;
-using MauiApp_AnyThingLM_RAG.Models;
 using MauiApp_AnyThingLM_RAG.Views;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
@@ -10,73 +8,42 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     public class AppShellViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        private List<Tab> _tabItems;
-
-        public SettingsViewModel SettingsViewModel { get; }
-        public List<Workspace> ListWorkSpaces { get; set; }
-        public List<Tab> TabItems
-        {
-            get => this._tabItems;
-            set
-            {
-                if(this._tabItems != value)
-                {
-                    this._tabItems = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
         public ICommand NavigateToSettingsCommand { get; }
+        public ICommand NavigateToHomeCommand { get; }
 
         public AppShellViewModel(SettingsViewModel settingsViewModel)
         {
             this.NavigateToSettingsCommand = new Command(NavigateToSettingsAsync);
-
-            this.ListWorkSpaces = new List<Workspace>();
-            this.TabItems = new List<Tab>();
-
-            this.SettingsViewModel = IPlatformApplication.Current.Services.GetService<SettingsViewModel>();
-            this.SettingsViewModel.PropertyChanged += SettingsViewModel_PropertyChanged;
+            this.NavigateToHomeCommand = new Command(NavigateToHomeAsync);
         }
 
-        //  EVENTOS SUBCRITOS
-        private async void SettingsViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        /// <summary>
+        /// Este método se encarga de navegar
+        /// desde la página en la que me encuentre
+        /// hasta la página home
+        /// </summary>
+        private async void NavigateToHomeAsync()
         {
-            if (e.PropertyName == nameof(SettingsViewModel.AnyThingLLManager))
+            if (Shell.Current.CurrentPage is HomePage)
             {
-                //  Obtener workspaces
-                var result = await this.SettingsViewModel.AnyThingLLManager.GetAllWorkSpaces();
-                this.ListWorkSpaces = result.Workspaces;
-
-                List<Tab> tabItems = new List<Tab>();
-
-                foreach (var workspace in this.ListWorkSpaces)
-                {
-                    var flyoutItem = new Tab
-                    {
-                        Title = workspace.Name,
-                    };
-
-                    foreach (Models.Thread thread in workspace.Threads)
-                    {
-                        var chatViewModel = ChatViewModelFactory.Create(thread.Name, workspace.Slug);
-                        var tabThread = new ShellContent
-                        {
-                            Title = thread.Name,
-                            ContentTemplate = new DataTemplate(() => ChatPageFactory.Create(chatViewModel))
-                        };
-
-                        flyoutItem.Items.Add(tabThread);
-                    }
-                    tabItems.Add(flyoutItem);
-                }
-
-                this.TabItems = tabItems;
+                Shell.Current.FlyoutIsPresented = false;
+                return;
             }
+            await Shell.Current.Navigation.PushAsync(IPlatformApplication.Current.Services.GetService<HomePage>());
+            Shell.Current.FlyoutIsPresented = false;
         }
+        /// <summary>
+        /// Este método se encarga de navegar desde la página en la
+        /// que me encuentre hasta la página settings
+        /// </summary>
         private async void NavigateToSettingsAsync()
         {
+            if (Shell.Current.CurrentPage is SettingsPage)
+            {
+                Shell.Current.FlyoutIsPresented = false;
+                return;
+            }
             await Shell.Current.Navigation.PushAsync(IPlatformApplication.Current.Services.GetService<SettingsPage>());
             Shell.Current.FlyoutIsPresented = false;
         }

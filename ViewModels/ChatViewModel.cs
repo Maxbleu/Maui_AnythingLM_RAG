@@ -13,6 +13,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     public class ChatViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
+        private SettingsViewModel _settingsViewModel;
         private AnyThingLLManager _anyThingLLManager;
 
         private ChatPage _chatPage;
@@ -76,7 +77,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 
         public ICommand NavigateToWorkspaceDocumentsCommand { get; }
         public ICommand ShowReferencesMetaDocumentCommand { get; }
-        public ICommand DeleteThreadCommand { get; }
+        public ICommand NavigateToChatSettingsCommand { get; }
         public ICommand SendMessageCommand { get; }
         
         public ChatViewModel(string threadName, string slug)
@@ -85,13 +86,14 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             this.ThreadName = threadName;
 
             this.SendMessageCommand = new Command(SendMessageAsync);
-            this.DeleteThreadCommand = new Command(DeleteThreadAsync);
+            this.NavigateToChatSettingsCommand = new Command(NavigateToChatSettingsAsync);
             this.ShowReferencesMetaDocumentCommand = new Command(ShowReferencesMetaDocument);
             this.NavigateToWorkspaceDocumentsCommand = new Command(NavigateToWorkspaceDocumentsAsync);
 
             this.Messages = new ObservableCollection<dynamic>();
 
-            this._anyThingLLManager = IPlatformApplication.Current.Services.GetService<SettingsViewModel>().AnyThingLLManager;
+            this._settingsViewModel = IPlatformApplication.Current.Services.GetService<SettingsViewModel>();
+            this._anyThingLLManager = this._settingsViewModel.AnyThingLLManager;
         }
         public ChatViewModel() { }
 
@@ -128,7 +130,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             );
 
             //  Enviar el mensaje al modelo
-            var objResult = await this._anyThingLLManager.SendMessageAsync(this.NewMessageText, this.ChatMode, this.Slug);
+            var objResult = await this._anyThingLLManager.SendMessageAsync(this.NewMessageText, this._settingsViewModel.SystemPrompt, this.ChatMode, this.Slug);
             if(objResult.GetType().GetProperty("Data") != null)
             {
 
@@ -166,20 +168,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 GuiUtils.SendSnakbarMessage(objResult.Error.ToString());
             }
         }
-        /// <summary>
-        /// Este método se encargará de eliminar
-        /// un thread registrado en el workspace
-        /// </summary>
-        private async void DeleteThreadAsync()
+        private async void NavigateToChatSettingsAsync()
         {
-            bool wantDeleteChat = await GuiUtils.DisplayAlertAsync(Shell.Current as Page, "Eliminación de thread", $"¿Desea eliminar este el chat {this.ThreadName}?", "Sí", "No");
 
-            if (wantDeleteChat)
-            {
-                //  Eliminar thread
-            }
         }
-
         #region INotifyPropertyChanged
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

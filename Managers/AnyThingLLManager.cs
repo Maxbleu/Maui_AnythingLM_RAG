@@ -21,7 +21,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         }
 
         //  CHAT
-        public async Task<dynamic> SendMessageAsync(string message, string chatMode, string slug)
+        public async Task<dynamic> SendMessageAsync(string message, string systemPrompt, string chatMode, string slug)
         {
             dynamic objResult = null;
             try
@@ -36,6 +36,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                         mode = chatMode.ToLower(),
                         sessionId = Guid.NewGuid().ToString(),
                         attachments = new object[0],
+                        systemPrompt = systemPrompt
                     };
 
                     string jsonPayload = JsonConvert.SerializeObject(payload);

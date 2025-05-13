@@ -3,12 +3,20 @@
     x:Class="MauiApp_AnyThingLM_RAG.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:views="clr-namespace:MauiApp_AnyThingLM_RAG.Views"
     FlyoutBehavior="Flyout"
     Shell.NavBarIsVisible="False"
     FlyoutWidth="250"
     Title="MauiApp_AnyThingLM_RAG">
+    
 
+    <ShellContent Title="Home" ContentTemplate="{DataTemplate views:HomePage}"/>
+    <Shell.FlyoutContent>
+        <ScrollView x:Name="scrollViewWorkspaces">
+            
+        </ScrollView>
+    </Shell.FlyoutContent>
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="#512BD4" HeightRequest="200">
             <Grid.RowDefinitions>
@@ -21,19 +29,39 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-                
-                <StackLayout Grid.Row="0" HorizontalOptions="End">
+
+                <Grid Grid.Row="0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
                     <Image
-                        Source="settings_white.svg"
+                        Source="home_white.svg"
+                        Grid.Column="0"
                         WidthRequest="30"
                         HeightRequest="30"
                         Aspect="AspectFit">
                         <Image.GestureRecognizers>
                             <TapGestureRecognizer
+                                Command="{Binding NavigateToHomeCommand}" />
+                        </Image.GestureRecognizers>
+                    </Image>
+
+                    <Image
+                        Source="settings_white.svg"
+                        Grid.Column="1"
+                        WidthRequest="30"
+                        HeightRequest="30"
+                        Aspect="AspectFit"
+                        HorizontalOptions="End">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer
                                 Command="{Binding NavigateToSettingsCommand}" />
                         </Image.GestureRecognizers>
                     </Image>
-                </StackLayout>
+                </Grid>
 
                 <Image Grid.Row="1"
                        Source="dotnet_bot.png" 
@@ -49,13 +77,9 @@
                        VerticalOptions="End"
                        Margin="0,0,0,20"/>
             </Grid>
-            
-            
+
+
         </Grid>
     </Shell.FlyoutHeader>
-
-    <ShellContent Title="Home" ContentTemplate="{DataTemplate views:HomePage}"/>
-
-    <FlyoutItem x:Name="Workspaces" Title="Workspaces"></FlyoutItem>
 
 </Shell>

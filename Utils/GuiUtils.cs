@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using CommunityToolkit.Maui.Alerts;
+﻿using CommunityToolkit.Maui.Alerts;
 
 namespace MauiApp_AnyThingLM_RAG.Utils
 {
@@ -45,6 +44,25 @@ namespace MauiApp_AnyThingLM_RAG.Utils
                 message,
                 textOkButton,
                 textCancelButton
+            );
+        }
+        /// <summary>
+        /// Este método se encarga de mostrar un prompt alert
+        /// para obtener inputs del usuario
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="titulo"></param>
+        /// <param name="message"></param>
+        /// <param name="textOkButton"></param>
+        /// <param name="textCancelButton"></param>
+        /// <returns></returns>
+        public async static Task<string> DisplayPromptAlertAsync(Page page, string titulo, string message, string textOkButton, string textCancelButton)
+        {
+            return await page.DisplayPromptAsync(
+                titulo,
+                message,
+                accept: textOkButton,
+                cancel: textCancelButton
             );
         }
         public static List<Button> GetButtonReferences(List<string> references)

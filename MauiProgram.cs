@@ -2,7 +2,6 @@
 using MauiApp_AnyThingLM_RAG.Views;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Maui;
-using MauiApp_AnyThingLM_RAG.Managers;
 
 namespace MauiApp_AnyThingLM_RAG
 {
@@ -25,7 +24,10 @@ namespace MauiApp_AnyThingLM_RAG
 
             builder.Services.AddSingleton<HomePage>();
             
+            builder.Services.AddSingleton<WorkspacesListViewModel>();
+
             builder.Services.AddSingleton<AppShellViewModel>();
+
 #if DEBUG
             builder.Logging.AddDebug();
 #endif
