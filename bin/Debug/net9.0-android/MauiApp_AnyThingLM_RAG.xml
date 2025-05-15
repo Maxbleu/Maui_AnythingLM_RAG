@@ -78,6 +78,13 @@
             los documentos y mostrarlos en la pantalla
             </summary>
         </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.NavigateToChatSettingsAsync">
+            <summary>
+            Este método se encarga navegar desde la pagina
+            de chat hasta la pagina de settings del chat del
+            modelo.
+            </summary>
+        </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.SettingsViewModel.ReloadConfigurationAsync">
             <summary>
             Este método realiza una llamada al método de recarga

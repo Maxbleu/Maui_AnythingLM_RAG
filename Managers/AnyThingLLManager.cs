@@ -9,52 +9,54 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 {
     public class AnyThingLLManager
     {
-        private string _baseUrl;
+        private HttpClient _httpClient;
         private string _apiKey;
 
         public WorkspaceRoot WorkspaceRoot { get; set; }
 
         public AnyThingLLManager(string baseUrl, string apiKey)
         {
-            _baseUrl = baseUrl;
-            _apiKey = apiKey;
+            this._httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(5),
+                BaseAddress = new Uri(baseUrl),
+            };
+            this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+            this._httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         //  CHAT
-        public async Task<dynamic> SendMessageAsync(string message, string systemPrompt, string chatMode, string slug)
+        public async Task<dynamic> SendMessageAsync(string message, string systemPrompt, double temperature, string maxTokens, string chatMode, string slug)
         {
             dynamic objResult = null;
             try
             {
-                using (var client = new HttpClient())
+                var payload = new
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+                    message = message,
+                    mode = chatMode.ToLower(),
+                    sessionId = Guid.NewGuid().ToString(),
+                    attachments = new object[0],
+                    systemPrompt = systemPrompt,
+                    maxTokens = maxTokens,
+                    temperature = temperature,
+                };
 
-                    var payload = new
+                string jsonPayload = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await this._httpClient.PostAsync($"/workspace/{slug}/chat", content);
+                if (response.IsSuccessStatusCode)
+                    objResult = await GetInfoChunks(response);
+                else
+                {
+                    objResult = new
                     {
-                        message = message,
-                        mode = chatMode.ToLower(),
-                        sessionId = Guid.NewGuid().ToString(),
-                        attachments = new object[0],
-                        systemPrompt = systemPrompt
-                    };
-
-                    string jsonPayload = JsonConvert.SerializeObject(payload);
-                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = await client.PostAsync($"{_baseUrl}/workspace/{slug}/chat", content);
-                    if (response.IsSuccessStatusCode)
-                        objResult = await GetInfoChunks(response);
-                    else
-                    {
-                        objResult = new
+                        Error = new
                         {
-                            Error = new
-                            {
-                                Message = "No se ha podido obtener respuesta"
-                            }
-                        };
-                    }
+                            Message = "No se ha podido obtener respuesta"
+                        }
+                    };
                 }
             }
             catch (Exception ex)
@@ -70,43 +72,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return objResult;
         }
-        private Dictionary<string, List<string>> GetReferenceDocument(dynamic sources)
-        {
-            Dictionary<string, List<string>> references = new Dictionary<string, List<string>>();
-            if (sources != null && sources.Count > 0)
-            {
-                foreach (var source in sources)
-                {
-                    string text = Regex.Replace(source["text"].ToString(), @"[\r\n]+", " ");
-
-                    //  Get the document
-                    int startIndex = text.IndexOf("sourceDocument: ") + "sourceDocument: ".Length;
-                    int endIndex = text.IndexOf(" published:");
-                    string sourceDocument = text.Substring(startIndex, endIndex - startIndex);
-
-                    //  Get the reference
-                    int indexOfStart = text.IndexOf("</document_metadata> ") + "</document_metadata> ".Length;
-                    string reference = text.Substring(indexOfStart).Trim();
-
-                    //  Add the reference to the dictionary
-                    if (!references.ContainsKey(sourceDocument))
-                    {
-                        references[sourceDocument] = new List<string>();
-                    }
-
-                    references[sourceDocument].Add(reference);
-                }
-            }
-
-            return references;
-        }
         private async Task<dynamic> GetInfoChunks(HttpResponseMessage response)
         {
             string responseContent = await response.Content.ReadAsStringAsync();
             dynamic result = JsonConvert.DeserializeObject(responseContent);
 
             string menssageResponse = (string)result.textResponse;
-            Dictionary<string, List<string>> reference = GetReferenceDocument(result.sources);
+            Dictionary<string, List<string>> reference = MessageReferenceUtils.GetReferenceDocument(result.sources);
 
             var objResult = new
             {
@@ -141,64 +113,59 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 {
                     string filePath = fileResult.FullPath;
 
-                    using (var client = new HttpClient())
+                    // 1. Subir el documento
+                    dynamic document = await UploadDocument(new FileResult(filePath), slug);
+                    if (document == null)
                     {
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-
-                        // 1. Subir el documento
-                        dynamic document = await UploadDocument(client, new FileResult(filePath), slug);
-                        if (document == null)
+                        result = new
                         {
-                            result = new
+                            Error = new
                             {
-                                Error = new
-                                {
-                                    Message = "El documento no se ha podido subir. Inténtelo de nuevo."
-                                }
-                            };
-                            return result;
-                        }
+                                Message = "El documento no se ha podido subir. Inténtelo de nuevo."
+                            }
+                        };
+                        return result;
+                    }
 
-                        string location = document.location;
-                        string title = document.title;
-                        string fileName = location.Substring(location.LastIndexOf('/') + 1);
+                    string location = document.location;
+                    string title = document.title;
+                    string fileName = location.Substring(location.LastIndexOf('/') + 1);
 
-                        // 2. Mover el documento al workspace.
-                        bool moved = await MoveDocument(client, location, fileName);
-                        if (!moved)
+                    // 2. Mover el documento al workspace.
+                    bool moved = await MoveDocument(location, fileName);
+                    if (!moved)
+                    {
+                        result = new
                         {
-                            result = new
+                            Error = new
                             {
-                                Error = new
-                                {
-                                    Message = "El documento no ha sido movido al workspace"
-                                }
-                            };
-                            return result;
-                        }
+                                Message = "El documento no ha sido movido al workspace"
+                            }
+                        };
+                        return result;
+                    }
 
-                        // 3. Actualizar embeddings
-                        bool updated = await UpdateEmbeddings(client, fileName, slug);
-                        if (updated)
+                    // 3. Actualizar embeddings
+                    bool updated = await UpdateEmbeddings(fileName, slug);
+                    if (updated)
+                    {
+                        result = new
                         {
-                            result = new
+                            Response = new
                             {
-                                Response = new
-                                {
-                                    Message = "El embedding ha sido modificado con éxito!"
-                                }
-                            };
-                        }
-                        else
+                                Message = "El embedding ha sido modificado con éxito!"
+                            }
+                        };
+                    }
+                    else
+                    {
+                        result = new
                         {
-                            result = new
+                            Error = new
                             {
-                                Error = new
-                                {
-                                    Message = "El embedding no ha podido ser modificado."
-                                }
-                            };
-                        }
+                                Message = "El embedding no ha podido ser modificado."
+                            }
+                        };
                     }
                 }
                 else
@@ -224,7 +191,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             }
             return result;
         }
-        private async Task<bool> MoveDocument(HttpClient client, string location, string toName)
+        private async Task<bool> MoveDocument(string location, string toName)
         {
             string workspaceFolder = "custom-documents/";
 
@@ -242,11 +209,11 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             string moveJson = JsonConvert.SerializeObject(movePayload);
             var moveContent = new StringContent(moveJson, Encoding.UTF8, "application/json");
-            HttpResponseMessage moveResponse = await client.PostAsync($"{this._baseUrl}/document/move-files", moveContent);
+            HttpResponseMessage moveResponse = await this._httpClient.PostAsync($"/document/move-files", moveContent);
 
             return moveResponse.IsSuccessStatusCode;
         }
-        private async Task<dynamic> UploadDocument(HttpClient client, FileResult fileResult, string slug)
+        private async Task<dynamic> UploadDocument(FileResult fileResult, string slug)
         {
             string originalFileName = fileResult.FileName;
 
@@ -267,7 +234,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
                     form.Add(fileContent, "file", originalFileName);
 
-                    HttpResponseMessage uploadResponse = await client.PostAsync($"{this._baseUrl}/document/upload", form);
+                    HttpResponseMessage uploadResponse = await this._httpClient.PostAsync($"/document/upload", form);
 
                     if (uploadResponse.IsSuccessStatusCode)
                     {
@@ -282,7 +249,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 }
             }
         }
-        private async Task<bool> UpdateEmbeddings(HttpClient client, string fileName, string slug)
+        private async Task<bool> UpdateEmbeddings(string fileName, string slug)
         {
             var updatePayload = new
             {
@@ -292,22 +259,16 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             string updateJson = JsonConvert.SerializeObject(updatePayload);
             var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
-            HttpResponseMessage updateResponse = await client.PostAsync(
-                $"{this._baseUrl}/workspace/{slug}/update-embeddings", updateContent);
+            HttpResponseMessage updateResponse = await this._httpClient.PostAsync(
+                $"/workspace/{slug}/update-embeddings", updateContent);
             return updateResponse.IsSuccessStatusCode;
         }
-
-        //  GET DOCUMENTS
         public async Task<dynamic> TakeWorkspaceDocumentsAsync(string slug)
         {
             dynamic result = null;
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-                    result = await GetAllDocuments(client, slug);
-                }
+                result = await GetAllDocuments(slug);
             }
             catch (Exception ex)
             {
@@ -321,10 +282,10 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             }
             return result;
         }
-        private async Task<dynamic> GetAllDocuments(HttpClient client, string slug)
+        private async Task<dynamic> GetAllDocuments(string slug)
         {
             dynamic result = null;
-            HttpResponseMessage response = await client.GetAsync($"{this._baseUrl}/workspace/{slug}");
+            HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{slug}");
             if (response.IsSuccessStatusCode)
             {
                 string responseContent = await response.Content.ReadAsStringAsync();
@@ -334,9 +295,11 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 //  Obtenemos los datos del workspace
                 this.WorkspaceRoot = JsonConvert.DeserializeObject<WorkspaceRoot>(contentFormatted);
 
+                Workspace workspace = this.WorkspaceRoot.Workspaces.Where(w => w.Slug == slug).FirstOrDefault();
+
                 //  Obtenemos la lista de documentos
                 List<Metadata> documents = new List<Metadata>();
-                foreach(Document doc in this.WorkspaceRoot.Workspaces[0].Documents)
+                foreach(Document doc in workspace.Documents)
                 {
                     //  Obtenemos los metadatos del documento
                     var metadata = JsonConvert.DeserializeObject<Metadata>(doc.Metadata);
@@ -370,18 +333,11 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             List<Workspace> workspaces = new List<Workspace>();
             try
             {
-                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
+                HttpResponseMessage response = await this._httpClient.GetAsync("/workspaces");
+                if (response.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-
-                    string uri = $"{this._baseUrl}/workspaces";
-                    HttpResponseMessage response = await client.GetAsync(uri);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        string responseContent = await response.Content.ReadAsStringAsync();
-                        this.WorkspaceRoot = JsonConvert.DeserializeObject<WorkspaceRoot>(responseContent);
-                    }
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    this.WorkspaceRoot = JsonConvert.DeserializeObject<WorkspaceRoot>(responseContent);
                 }
             }
             catch (Exception ex)
@@ -396,30 +352,25 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             dynamic objResult = null;
             try
             {
-                using (var client = new HttpClient())
+                HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{slug}/chats");
+                if (response.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-
-                    HttpResponseMessage response = await client.GetAsync($"{_baseUrl}/workspace/{slug}/chats");
-                    if (response.IsSuccessStatusCode)
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    var responseJson = JsonConvert.DeserializeObject<dynamic>(responseContent);
+                    objResult = new
                     {
-                        string responseContent = await response.Content.ReadAsStringAsync();
-                        var responseJson = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                        objResult = new
-                        {
-                            Data = responseJson
-                        };
-                    }
-                    else
+                        Data = responseJson
+                    };
+                }
+                else
+                {
+                    objResult = new
                     {
-                        objResult = new
+                        Error = new
                         {
-                            Error = new
-                            {
-                                Message = "No se ha podido obtener respuesta"
-                            }
-                        };
-                    }
+                            Message = "No se ha podido obtener respuesta"
+                        }
+                    };
                 }
             }
             catch (Exception ex)
@@ -440,41 +391,36 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             dynamic objResult = null;
             try
             {
-                using (var client = new HttpClient())
+                var payload = new
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+                    name = slug,
+                    similarityThreshold = 0.7,
+                    openAiTemp = 0.7,
+                    openAiHistory = 20,
+                    openAiPrompt = "Custom prompt for responses",
+                    queryRefusalResponse = "Custom refusal message",
+                    chatMode = "chat",
+                    topN = 4
+                };
 
-                    var payload = new
+                string jsonPayload = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await this._httpClient.PostAsync($"/workspace/new", content);
+                if (response.IsSuccessStatusCode)
+                    objResult = new
                     {
-                        name = slug,
-                        similarityThreshold = 0.7,
-                        openAiTemp = 0.7,
-                        openAiHistory = 20,
-                        openAiPrompt = "Custom prompt for responses",
-                        queryRefusalResponse = "Custom refusal message",
-                        chatMode = "chat",
-                        topN = 4
+                        Data = "Se ha creado el workspace"
                     };
-
-                    string jsonPayload = JsonConvert.SerializeObject(payload);
-                    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-                    HttpResponseMessage response = await client.PostAsync($"{_baseUrl}/workspace/new", content);
-                    if (response.IsSuccessStatusCode)
-                        objResult = new
-                        {
-                            Data = "Se ha creado el workspace"
-                        };
-                    else
+                else
+                {
+                    objResult = new
                     {
-                        objResult = new
+                        Error = new
                         {
-                            Error = new
-                            {
-                                Message = "No se ha podido obtener respuesta"
-                            }
-                        };
-                    }
+                            Message = "No se ha podido obtener respuesta"
+                        }
+                    };
                 }
             }
             catch (Exception ex)
@@ -495,26 +441,21 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             dynamic objResult = null;
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-
-                    HttpResponseMessage response = await client.DeleteAsync($"{this._baseUrl}/workspace/{slug}");
-                    if (response.IsSuccessStatusCode)
-                        objResult = new
-                        {
-                            Data = "Se ha eliminado el workspace"
-                        };
-                    else
+                HttpResponseMessage response = await this._httpClient.DeleteAsync($"/workspace/{slug}");
+                if (response.IsSuccessStatusCode)
+                    objResult = new
                     {
-                        objResult = new
+                        Data = "Se ha eliminado el workspace"
+                    };
+                else
+                {
+                    objResult = new
+                    {
+                        Error = new
                         {
-                            Error = new
-                            {
-                                Message = "No se ha podido obtener respuesta"
-                            }
-                        };
-                    }
+                            Message = "No se ha podido obtener respuesta"
+                        }
+                    };
                 }
             }
             catch (Exception ex)
@@ -532,33 +473,45 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         }
 
         //  THREAD
+        public async Task<ConversationHistory>? GetThreadMessagesAsync(string workspaceSlug, string threadSlug)
+        {
+            ConversationHistory conversation = null;
+
+            try
+            {
+                HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{workspaceSlug}/thread/{threadSlug}/chats");
+                string responseContent = await response.Content.ReadAsStringAsync();
+                conversation = JsonConvert.DeserializeObject<ConversationHistory>(responseContent);
+            }
+            catch (Exception ex)
+            {
+                conversation = null;
+            }
+
+            return conversation;
+        }
         public async Task<dynamic> CreateNewThread(string slug)
         {
             dynamic objResult = null;
             try
             {
-                using (var client = new HttpClient())
+                HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{slug}/thread/new");
+                if (response.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-
-                    HttpResponseMessage response = await client.GetAsync($"{_baseUrl}/workspace/{slug}/thread/new");
-                    if (response.IsSuccessStatusCode)
+                    objResult = new
                     {
-                        objResult = new
-                        {
-                            Data = "Se ha creado el hilo correctamente"
-                        };
-                    }
-                    else
+                        Data = "Se ha creado el hilo correctamente"
+                    };
+                }
+                else
+                {
+                    objResult = new
                     {
-                        objResult = new
+                        Error = new
                         {
-                            Error = new
-                            {
-                                Message = "No se ha podido obtener respuesta"
-                            }
-                        };
-                    }
+                            Message = "No se ha podido obtener respuesta"
+                        }
+                    };
                 }
             }
             catch (Exception ex)
@@ -579,28 +532,23 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             dynamic objResult = null;
             try
             {
-                using (var client = new HttpClient())
+                HttpResponseMessage response = await this._httpClient.DeleteAsync($"/workspace/{slug}/thread/{threadSlug}");
+                if (response.IsSuccessStatusCode)
                 {
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
-
-                    HttpResponseMessage response = await client.DeleteAsync($"{_baseUrl}/workspace/{slug}/thread/{threadSlug}");
-                    if (response.IsSuccessStatusCode)
+                    objResult = new
                     {
-                        objResult = new
-                        {
-                            Data = "Se ha eliminado el hilo correctamente"
-                        };
-                    }
-                    else
+                        Data = "Se ha eliminado el hilo correctamente"
+                    };
+                }
+                else
+                {
+                    objResult = new
                     {
-                        objResult = new
+                        Error = new
                         {
-                            Error = new
-                            {
-                                Message = "No se ha podido obtener respuesta"
-                            }
-                        };
-                    }
+                            Message = "No se ha podido obtener respuesta"
+                        }
+                    };
                 }
             }
             catch (Exception ex)

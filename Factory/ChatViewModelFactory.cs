@@ -1,4 +1,5 @@
-﻿using MauiApp_AnyThingLM_RAG.ViewModels;
+﻿using MauiApp_AnyThingLM_RAG.Models;
+using MauiApp_AnyThingLM_RAG.ViewModels;
 
 namespace MauiApp_AnyThingLM_RAG.Factory
 {

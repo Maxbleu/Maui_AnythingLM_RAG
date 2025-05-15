@@ -16,6 +16,8 @@ namespace MauiApp_AnyThingLM_RAG
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             }).UseMauiCommunityToolkit();
 
+            builder.Services.AddTransient<ChatSettingsViewModel>();
+
             builder.Services.AddSingleton<SettingsViewModel>();
             builder.Services.AddSingleton<SettingsPage>();
 
@@ -24,8 +26,6 @@ namespace MauiApp_AnyThingLM_RAG
 
             builder.Services.AddSingleton<HomePage>();
             
-            builder.Services.AddSingleton<WorkspacesListViewModel>();
-
             builder.Services.AddSingleton<AppShellViewModel>();
 
 #if DEBUG

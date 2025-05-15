@@ -13,9 +13,9 @@
 
     <ShellContent Title="Home" ContentTemplate="{DataTemplate views:HomePage}"/>
     <Shell.FlyoutContent>
-        <ScrollView x:Name="scrollViewWorkspaces">
+        <StackLayout x:Name="stackLayoutWorkspaces" Background="White">
             
-        </ScrollView>
+        </StackLayout>
     </Shell.FlyoutContent>
     <Shell.FlyoutHeader>
         <Grid BackgroundColor="#512BD4" HeightRequest="200">

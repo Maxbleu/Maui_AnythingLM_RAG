@@ -13,7 +13,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     public class ChatViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
-        private SettingsViewModel _settingsViewModel;
+        private ChatSettingsViewModel _chatSettingsViewModel;
         private AnyThingLLManager _anyThingLLManager;
 
         private ChatPage _chatPage;
@@ -90,12 +90,41 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             this.ShowReferencesMetaDocumentCommand = new Command(ShowReferencesMetaDocument);
             this.NavigateToWorkspaceDocumentsCommand = new Command(NavigateToWorkspaceDocumentsAsync);
 
-            this.Messages = new ObservableCollection<dynamic>();
+            this.LoadConversation();
 
-            this._settingsViewModel = IPlatformApplication.Current.Services.GetService<SettingsViewModel>();
-            this._anyThingLLManager = this._settingsViewModel.AnyThingLLManager;
+            this._chatSettingsViewModel = IPlatformApplication.Current.Services.GetService<ChatSettingsViewModel>();
+            this._anyThingLLManager = IPlatformApplication.Current.Services.GetService<SettingsViewModel>().AnyThingLLManager;
         }
         public ChatViewModel() { }
+
+        private async void LoadConversation()
+        {
+            //  Obtener thread slug
+            string threadSlug = this._anyThingLLManager.WorkspaceRoot.Workspaces.Where(w => w.Threads.Where(t => t.Name == this.ThreadName).Any()).FirstOrDefault()?.ToString();
+
+            //  Obtenemos mensajes
+            ConversationHistory conversationHistory = await this._anyThingLLManager.GetThreadMessagesAsync(this.Slug, threadSlug);
+
+            if(conversationHistory.History.Count > 0)
+            {
+                foreach(MessageItem item in conversationHistory.History)
+                {
+                    dynamic obj = new
+                    {
+                        Text = item.Content,
+                        IsCurrentUser = item.Role == "user" ? true : false,
+                    };
+
+                    if (!obj.IsCurrentUser)
+                    {
+                        Dictionary<string, List<string>> reference = MessageReferenceUtils.GetReferenceDocument(item.Sources);
+                        obj["Keys"] = new ObservableCollection<string>(reference.Keys);
+                    }
+
+                    this.Messages.Add(obj);
+                }
+            }
+        }
 
         /// <summary>
         /// Este método se encarga de mostrar las referencias
@@ -106,7 +135,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         private void ShowReferencesMetaDocument(object sender)
         {
             //  Obtener las referencias del documento
-
+            
 
             //  Mostrar las referencias en la vista
         }
@@ -130,7 +159,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             );
 
             //  Enviar el mensaje al modelo
-            var objResult = await this._anyThingLLManager.SendMessageAsync(this.NewMessageText, this._settingsViewModel.SystemPrompt, this.ChatMode, this.Slug);
+            var objResult = await this._anyThingLLManager.SendMessageAsync(this.NewMessageText, this._chatSettingsViewModel.SystemPrompt, this._chatSettingsViewModel.Temperature, this._chatSettingsViewModel.MaxTokens, this.ChatMode, this.Slug);
             if(objResult.GetType().GetProperty("Data") != null)
             {
 
@@ -140,7 +169,12 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 var keys = new ObservableCollection<string>(this.References.Keys);
                 this.Messages.Add
                 (
-                    new Message(text, keys, false)
+                    new 
+                    { 
+                        Text = text, 
+                        Keys = keys,
+                        IsCurrentUser = false 
+                    }
                 );
             }
             else
@@ -168,9 +202,15 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 GuiUtils.SendSnakbarMessage(objResult.Error.ToString());
             }
         }
+        /// <summary>
+        /// Este método se encarga navegar desde la pagina
+        /// de chat hasta la pagina de settings del chat del
+        /// modelo.
+        /// </summary>
         private async void NavigateToChatSettingsAsync()
         {
-
+            ChatSettingsViewModel chatSettingsViewModel = IPlatformApplication.Current.Services.GetService<ChatSettingsViewModel>();
+            await Shell.Current.Navigation.PushAsync(ChatSettingsPageFactory.Create(chatSettingsViewModel));
         }
         #region INotifyPropertyChanged
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
