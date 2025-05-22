@@ -15,16 +15,27 @@ namespace MauiApp_AnyThingLM_RAG
 
             this._appShellViewModel.PropertyChanged += WorkspacesListViewModel_PropertyChanged;
         }
-
         private async void WorkspacesListViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if(e.PropertyName == nameof(AppShellViewModel.IsExpanderItemsLoaded) && this._appShellViewModel.IsExpanderItemsLoaded)
             {
-                foreach(Expander expander in this._appShellViewModel.ExpanderItems)
+                this.stackLayoutWorkspaces.Clear();
+                this.labelNotConnectedAnythingllm.IsVisible = false;
+                if(this._appShellViewModel.ExpanderItems.Count > 0)
                 {
-                    this.stackLayoutWorkspaces.Add(expander);
+                    this.labelNoThereAreWorkspaces.IsVisible = false;
+                    this.stackLayoutWorkspaces.IsVisible = true;
+                    foreach (Expander expander in this._appShellViewModel.ExpanderItems)
+                    {
+                        this.stackLayoutWorkspaces.Add(expander);
+                    }
+                    await Task.Delay(1000);
                 }
-                await Task.Delay(1000);
+                else
+                {
+                    this.labelNoThereAreWorkspaces.IsVisible = true;
+                }
+                this.CreateWorkspaceButton.IsEnabled = true;
                 this._appShellViewModel.IsExpanderItemsLoaded = false;
             }
         }

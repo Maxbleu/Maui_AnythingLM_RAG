@@ -1,47 +1,42 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MauiApp_AnyThingLM_RAG.Views.WorkspaceDocumentsPage">
+             x:Class="MauiApp_AnyThingLM_RAG.Views.WorkspaceDocumentsPage"
+             Shell.NavBarIsVisible="True">
 
-    <Grid Margin="15">
+    <Shell.TitleView>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" 
+                Text="Documentos" 
+                VerticalOptions="Center" 
+                FontSize="20"
+                TextColor="White"
+                FontAttributes="Bold"/>
+
+            <Button Grid.Column="1" ImageSource="upload_file.svg"
+                Margin="0,0,0,0" BorderWidth="1" HorizontalOptions="End"
+                Command="{Binding UploadDocumentCommand}" BackgroundColor="#512BD4"/>
+            
+        </Grid>
+    </Shell.TitleView>
+    
+    <Grid>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" 
-                ImageSource="back.svg" 
-                HeightRequest="44"
-                WidthRequest="44"
-                Padding="0"
-                BorderWidth="1"
-                VerticalOptions="Center"
-                Command="{Binding GoBackCommand}"/>
-
-            <Label Grid.Column="1" 
-                Text="Documentos"
-                FontSize="30" 
-                FontAttributes="Bold"
-                TextColor="#333333"
-                Margin="16,0,0,0"
-                VerticalOptions="End"/>
-        </Grid>
-        <Frame Grid.Row="1" 
-            BorderColor="#E0E0E0" 
+        <Frame Grid.Row="0" 
             CornerRadius="10" 
             HasShadow="True" 
             Padding="0"
-            BackgroundColor="White"
-            Margin="0,10,0,0">
+            Margin="0,0,0,0">
 
             <Grid RowSpacing="0">
                 <Grid.RowDefinitions>
@@ -51,8 +46,8 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" 
-                      BackgroundColor="#F0F4F8" 
-                      Padding="16,12">
+                      Padding="16,12"
+                      BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray600}}">
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -63,24 +58,21 @@
                     <Label Grid.Column="0" 
                         Text="Nombre" 
                         FontSize="16"
-                        FontAttributes="Bold"
-                        TextColor="#555555"/>
+                        FontAttributes="Bold"/>
 
                     <Label Grid.Column="1" 
                         Text="Palabras" 
                         FontSize="16"
                         FontAttributes="Bold"
-                        TextColor="#555555"
                         HorizontalOptions="Center"
-                        WidthRequest="100"/>
+                        WidthRequest="80"/>
 
                     <Label Grid.Column="2" 
                         Text="Fecha" 
                         FontSize="16"
                         FontAttributes="Bold"
-                        TextColor="#555555"
                         HorizontalOptions="Center"
-                        WidthRequest="70"/>
+                        WidthRequest="90"/>
                 </Grid>
                 <CollectionView Grid.Row="1" 
                         ItemsSource="{Binding Documents}" 
@@ -110,24 +102,23 @@
                                     Text="{Binding Title}"
                                     FontSize="15"
                                     LineBreakMode="WordWrap"
+                                    MaxLines="2"
                                     VerticalOptions="Center"
-                                    TextColor="#333333"/>
+                                    Padding="0,0,10,0"/>
 
                                 <Label Grid.Column="1"
                                     Text="{Binding WordCount}"
                                     FontSize="14"
                                     VerticalOptions="Center"
                                     HorizontalOptions="Center"
-                                    TextColor="#666666"
-                                    WidthRequest="90"/>
+                                    WidthRequest="70"/>
 
                                 <Label Grid.Column="2"
                                     Text="{Binding Published, StringFormat='{0:dd/MM/yyyy}'}"
                                     FontSize="14"
                                     VerticalOptions="Center"
                                     HorizontalOptions="Center"
-                                    TextColor="#666666"
-                                    WidthRequest="70"/>
+                                    WidthRequest="90"/>
 
                                 <Grid.Triggers>
                                     <DataTrigger TargetType="Grid" 
@@ -142,27 +133,6 @@
                 </CollectionView>
             </Grid>
         </Frame>
-        <Grid Grid.Row="1" 
-            BackgroundColor="#80FFFFFF" 
-            IsVisible="{Binding IsLoading}">
-            <ActivityIndicator IsRunning="{Binding IsLoading}" 
-                            Color="#3F51B5" 
-                            HorizontalOptions="Center" 
-                            VerticalOptions="Center"
-                            WidthRequest="40"
-                            HeightRequest="40"/>
-        </Grid>
-        <Grid Grid.Row="2" Margin="0,10,0,0">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <Button Grid.Row="0" Text="Añadir"
-                    Padding="0" BorderWidth="1"
-                    Command="{Binding UploadDocumentCommand}"/>
-
-        </Grid>
     </Grid>
 
 </ContentPage>

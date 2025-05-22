@@ -44,6 +44,43 @@
             <param name="textCancelButton"></param>
             <returns></returns>
         </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.OpenChatAsync(System.Object)">
+            <summary>
+            Este método se encarga de navegar
+            desde la pantalla que se encuentre
+            el usuario hasta la pantalla 
+            de conversación
+            </summary>
+            <param name="parameter"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.CreateThreadAsync(System.Object)">
+            <summary>
+            Este método se encarga de crear 
+            un hilos en un workspace
+            </summary>
+            <param name="parameter"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.CreateWorkspaceAsync">
+            <summary>
+            Este método se encarga de crear
+            un workspace en la aplicación
+            </summary>
+            <param name="parameter"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.DeleteWorkspaceAsync(System.Object)">
+            <summary>
+            Este método se encarga de eliminar
+            un workspace específico de la aplicación
+            </summary>
+            <param name="parameter"></param>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.DeleteThreadAsync(System.Object)">
+            <summary>
+            Este método se encarga de eliminar
+            un hilo en un workspace
+            </summary>
+            <param name="parameter"></param>
+        </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.NavigateToHomeAsync">
             <summary>
             Este método se encarga de navegar
@@ -56,14 +93,6 @@
             Este método se encarga de navegar desde la página en la
             que me encuentre hasta la página settings
             </summary>
-        </member>
-        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.ShowReferencesMetaDocument(System.Object)">
-            <summary>
-            Este método se encarga de mostrar las referencias
-            que ha encontrado el modelo en el documento para
-            realizar el mensaje que ha recibido el usuario
-            </summary>
-            <param name="sender"></param>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.SendMessageAsync">
             <summary>

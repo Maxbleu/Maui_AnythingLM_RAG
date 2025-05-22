@@ -6,6 +6,7 @@
         public string Slug { get; set; }
         public string Route { get; set; }
         public string UserId { get; set; }
+        public int WorkspaceId {  get; set; }
         public DataTemplate ContentTemplate { get; set; }
     }
 }

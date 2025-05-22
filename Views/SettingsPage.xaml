@@ -2,7 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:Shapes="clr-namespace:Microsoft.Maui.Controls.Shapes;assembly=Microsoft.Maui.Controls"
-             x:Class="MauiApp_AnyThingLM_RAG.Views.SettingsPage">
+             x:Class="MauiApp_AnyThingLM_RAG.Views.SettingsPage"
+             Shell.NavBarIsVisible="True"
+             Title="Settings">
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
@@ -12,30 +14,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" 
-            ImageSource="back.svg" 
-            HeightRequest="44"
-            WidthRequest="44"
-            Padding="0"
-            BorderWidth="1"
-            VerticalOptions="Center"
-            Command="{Binding GoBackCommand}"/>
-
-            <Label Grid.Column="1"
-               Text="Settings" 
-               FontSize="20" 
-               Margin="10,0,0,0"
-               FontAttributes="Bold"
-               VerticalOptions="Center"/>
-
-        </Grid>
+        
         <Grid Grid.Row="1" Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -87,9 +66,9 @@
                     FontSize="16"/>
 
                 <Button Grid.Column="3"
-                ImageSource="refresh.svg"
-                Command="{Binding ReloadConfigurationCommand}"
-                IsEnabled="{Binding IsEnabledButton}"/>
+                    ImageSource="refresh.svg" BackgroundColor="#512BD4"
+                    Command="{Binding ReloadConfigurationCommand}"
+                    IsEnabled="{Binding IsEnabledButton}"/>
             </Grid>
         </Grid>
         <Grid Grid.Row="3" Margin="0,20,0,0">
@@ -104,18 +83,6 @@
                     IsPassword="True"
                     Placeholder="Put your API KEY" 
                     FontSize="16"/>
-        </Grid>
-        <Grid Grid.Row="4" Margin="0,20,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <Label Grid.Row="0" Grid.ColumnSpan="3" Text="System promt" FontSize="16"/>
-
-            <Entry Text="{Binding SystemPrompt}"
-                   Grid.Row="1" FontSize="16"
-                   Placeholder="Enter the system prompt" />
         </Grid>
     </Grid>
 </ContentPage>

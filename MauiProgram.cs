@@ -14,6 +14,7 @@ namespace MauiApp_AnyThingLM_RAG
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("FerroRosso.ttf", "FerroRosso");
             }).UseMauiCommunityToolkit();
 
             builder.Services.AddTransient<ChatSettingsViewModel>();

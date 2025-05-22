@@ -20,7 +20,6 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         private string _port = "3001";
         private string _apiKey = "GKYQ7MW-9N6M23A-M2E4ASX-ZYTNMJ8";
         private string _baseUrl = "";
-        private string _systemPrompt = "";
 
         private bool _isEnabledButton = true;
         private bool _isAnyThingLMRunning = false;
@@ -81,18 +80,6 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 if (this._apiKey != value)
                 {
                     this._apiKey = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public string SystemPrompt
-        {
-            get => this._systemPrompt;
-            set
-            {
-                if(this._systemPrompt != value)
-                {
-                    this._systemPrompt = value;
                     OnPropertyChanged();
                 }
             }

@@ -4,85 +4,88 @@
              xmlns:maui="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:viewModels="clr-namespace:MauiApp_AnyThingLM_RAG.ViewModels"
              xmlns:views="clr-namespace:MauiApp_AnyThingLM_RAG.Views"
-             x:Class="MauiApp_AnyThingLM_RAG.Views.ChatPage">
+             x:Class="MauiApp_AnyThingLM_RAG.Views.ChatPage"
+             Shell.NavBarIsVisible="True">
 
-    <Grid BackgroundColor="#F5F5F5">
+    <Shell.TitleView>
+        <Grid>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Column="0" 
+                Text="{Binding ThreadName}" 
+                Margin="12,0,0,0"
+                VerticalOptions="Center" 
+                FontSize="20"
+                TextColor="White"
+                FontAttributes="Bold"/>
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Text="{Binding ChatMode}" 
+                       FontSize="16" FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="10,0,0,0" TextColor="White">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label"
+                                     Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
+                                     Value="true">
+                            <Setter Property="Text" Value="Query" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
+                <Switch Grid.Column="1" x:Name="chatModeSwitch" OnColor="MediumSpringGreen">
+                    <Switch.Triggers>
+                        <DataTrigger TargetType="Switch" 
+                                     Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
+                                     Value="True">
+                            <Setter Property="ThumbColor" Value="MediumSpringGreen" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Switch" 
+                                     Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
+                                     Value="False">
+                            <Setter Property="ThumbColor" Value="Red" />
+                        </DataTrigger>
+                    </Switch.Triggers>
+                </Switch>
+
+
+                <Button Grid.Column="2" x:Name="workspaceDocuments" 
+                        HeightRequest="50" VerticalOptions="Center" 
+                        HorizontalOptions="End" ImageSource="settings_white.svg"
+                        Command="{Binding NavigateToChatSettingsCommand}" BackgroundColor="#512BD4"/>
+            </Grid>
+
+        </Grid>
+
+    </Shell.TitleView>
+    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1F1F1F1F}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Border Padding="15" Stroke="#E5E5E5" BackgroundColor="White">
-            <Grid Grid.Row="0">
-
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0" 
-                    Text="{Binding ThreadName}" 
-                    Margin="12,0,0,0"
-                    VerticalOptions="Center" 
-                    FontSize="20"
-                    TextColor="Black"
-                    FontAttributes="Bold"/>
-
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <Label Grid.Column="0" Text="{Binding ChatMode}" 
-                        FontSize="16" FontAttributes="Bold"
-                        VerticalOptions="Center"
-                        Margin="10,0,0,0" TextColor="Black">
-                        <Label.Triggers>
-                            <DataTrigger TargetType="Label"
-                                        Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
-                                        Value="true">
-                                <Setter Property="Text" Value="Query" />
-                            </DataTrigger>
-                        </Label.Triggers>
-                    </Label>
-                    <Switch Grid.Column="1" x:Name="chatModeSwitch" OnColor="MediumSpringGreen">
-                        <Switch.Triggers>
-                            <DataTrigger TargetType="Switch" 
-                                        Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
-                                        Value="True">
-                                <Setter Property="ThumbColor" Value="MediumSpringGreen" />
-                            </DataTrigger>
-                            <DataTrigger TargetType="Switch" 
-                                        Binding="{Binding Source={x:Reference chatModeSwitch}, Path=IsToggled}" 
-                                        Value="False">
-                                <Setter Property="ThumbColor" Value="Red" />
-                            </DataTrigger>
-                        </Switch.Triggers>
-                    </Switch>
-                    <Button Grid.Column="2" x:Name="workspaceDocuments" 
-                        HeightRequest="50" VerticalOptions="Center" 
-                        HorizontalOptions="End" ImageSource="settings_white.svg"
-                        Command="{Binding NavigateToChatSettingsCommand}"/>
-                </Grid>
-
-            </Grid>
-        </Border>
-
-        <CollectionView x:Name="ListMessages" Grid.Row="1" BackgroundColor="#F5F5F5" Margin="16" ItemsSource="{Binding Messages}" ItemsUpdatingScrollMode="KeepLastItemInView">
+        <CollectionView x:Name="ListMessages" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1F1F1F1F}" Grid.Row="1" Margin="16" ItemsSource="{Binding Messages}" ItemsUpdatingScrollMode="KeepLastItemInView">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <StackLayout Margin="0,4">
                         <Frame x:Name="FrameMessage" Padding="12" CornerRadius="20" HasShadow="False" MaximumWidthRequest="300">
                             <Frame.Style>
                                 <Style TargetType="Frame">
-                                    <Setter Property="BackgroundColor" Value="White"/>
+                                    <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray600}}"/>
                                     <Setter Property="HorizontalOptions" Value="Start"/>
                                     <Style.Triggers>
                                         <DataTrigger TargetType="Frame" Binding="{Binding IsCurrentUser}" Value="True">
-                                            <Setter Property="BackgroundColor" Value="#007AFF"/>
+                                            <Setter Property="BackgroundColor" Value="#512BD4"/>
                                             <Setter Property="HorizontalOptions" Value="End"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -91,7 +94,7 @@
                             <Label Text="{Binding Text}" FontSize="16">
                                 <Label.Style>
                                     <Style TargetType="Label">
-                                        <Setter Property="TextColor" Value="Black"/>
+                                        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"/>
                                         <Style.Triggers>
                                             <DataTrigger TargetType="Label" Binding="{Binding IsCurrentUser}" Value="True">
                                                 <Setter Property="TextColor" Value="White"/>
@@ -104,17 +107,12 @@
                         <CollectionView ItemsSource="{Binding Keys}" ItemsLayout="VerticalList">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Frame BackgroundColor="#007AFF" CornerRadius="30"
+                                    <Frame BackgroundColor="#512BD4" CornerRadius="30"
                                             HeightRequest="35" Padding="12,0" HasShadow="False" 
                                             HorizontalOptions="Start" Margin="0,3,0,0">
                                         <Label Text="{Binding}" TextColor="White" 
                                                 FontSize="10" VerticalOptions="Center"
-                                                HorizontalOptions="Center">
-                                            <Label.GestureRecognizers>
-                                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:ChatViewModel}}, Path=ShowReferencesMetaDocumentCommand}"
-                                                    CommandParameter="{Binding}" />
-                                            </Label.GestureRecognizers>
-                                        </Label>
+                                                HorizontalOptions="Center" />
                                     </Frame>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -124,7 +122,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Grid Grid.Row="2" BackgroundColor="White" Padding="15">
+        <Grid Grid.Row="2" BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1F1F1F1F}" Padding="15">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -133,21 +131,20 @@
 
             <Button Grid.Column="0" x:Name="SendDocument" 
                 Command="{Binding NavigateToWorkspaceDocumentsCommand}"
-                HeightRequest="50" VerticalOptions="Center" 
+                HeightRequest="50" VerticalOptions="Center" BackgroundColor="#512BD4"
                 HorizontalOptions="End" ImageSource="workspace_documents.svg"/>
 
             <Editor Grid.Column="1" x:Name="MessageEditor"
                 Text="{Binding NewMessageText, Mode=TwoWay}"
                 Placeholder="Escribe un mensaje..."
-                BackgroundColor="#F5F5F5" TextColor="Black" 
-                FontSize="16" HeightRequest="50" Margin="8,0,8,0"/>
+                FontSize="16" HeightRequest="50" Margin="8,0,8,0"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark=#1F1F1F1F}"/>
 
             <Button Grid.Column="2" x:Name="SendButton" 
                 Command="{Binding SendMessageCommand}"
-                HeightRequest="50" VerticalOptions="Center" 
+                HeightRequest="50" VerticalOptions="Center" BackgroundColor="#512BD4"
                 HorizontalOptions="End" ImageSource="send_message.svg"/>
         </Grid>
 
     </Grid>
-
 </ContentPage>

@@ -1,17 +1,18 @@
 ﻿using System.Text.RegularExpressions;
+using MauiApp_AnyThingLM_RAG.Models;
 
 namespace MauiApp_AnyThingLM_RAG.Utils
 {
     public static class MessageReferenceUtils
     {
-        public static Dictionary<string, List<string>> GetReferenceDocument(dynamic sources)
+        public static Dictionary<string, List<string>> GetReferenceDocument(List<Source> sources)
         {
             Dictionary<string, List<string>> references = new Dictionary<string, List<string>>();
             if (sources != null && sources.Count > 0)
             {
                 foreach (var source in sources)
                 {
-                    string text = Regex.Replace(source["text"].ToString(), @"[\r\n]+", " ");
+                    string text = Regex.Replace(source.Text, @"[\r\n]+", " ");
 
                     //  Get the document
                     int startIndex = text.IndexOf("sourceDocument: ") + "sourceDocument: ".Length;

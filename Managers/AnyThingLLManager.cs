@@ -1,16 +1,19 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using MauiApp_AnyThingLM_RAG.Models;
 using MauiApp_AnyThingLM_RAG.Utils;
+using MauiApp_IA_IOT.Util;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MauiApp_AnyThingLM_RAG.Managers
 {
     public class AnyThingLLManager
     {
         private HttpClient _httpClient;
-        private string _apiKey;
+        private string _baseUrl;
 
         public WorkspaceRoot WorkspaceRoot { get; set; }
 
@@ -18,10 +21,10 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         {
             this._httpClient = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(5),
-                BaseAddress = new Uri(baseUrl),
+                Timeout = TimeSpan.FromSeconds(10)
             };
-            this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this._apiKey);
+            this._baseUrl = baseUrl;
+            this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             this._httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
@@ -45,7 +48,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 string jsonPayload = JsonConvert.SerializeObject(payload);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await this._httpClient.PostAsync($"/workspace/{slug}/chat", content);
+                string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}/chat");
+                HttpResponseMessage response = await this._httpClient.PostAsync(url, content);
                 if (response.IsSuccessStatusCode)
                     objResult = await GetInfoChunks(response);
                 else
@@ -78,7 +82,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             dynamic result = JsonConvert.DeserializeObject(responseContent);
 
             string menssageResponse = (string)result.textResponse;
-            Dictionary<string, List<string>> reference = MessageReferenceUtils.GetReferenceDocument(result.sources);
+            List<Source> sources = (result.sources as JArray).ToObject<List<Source>>();
+            Dictionary<string, List<string>> reference = MessageReferenceUtils.GetReferenceDocument(sources);
 
             var objResult = new
             {
@@ -234,7 +239,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
                     form.Add(fileContent, "file", originalFileName);
 
-                    HttpResponseMessage uploadResponse = await this._httpClient.PostAsync($"/document/upload", form);
+                    string url = UrlUtils.GetFullUrl(this._baseUrl, "/document/upload");
+                    HttpResponseMessage uploadResponse = await this._httpClient.PostAsync(url, form);
 
                     if (uploadResponse.IsSuccessStatusCode)
                     {
@@ -259,8 +265,9 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             string updateJson = JsonConvert.SerializeObject(updatePayload);
             var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
-            HttpResponseMessage updateResponse = await this._httpClient.PostAsync(
-                $"/workspace/{slug}/update-embeddings", updateContent);
+
+            string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}/update-embeddings");
+            HttpResponseMessage updateResponse = await this._httpClient.PostAsync(url, updateContent);
             return updateResponse.IsSuccessStatusCode;
         }
         public async Task<dynamic> TakeWorkspaceDocumentsAsync(string slug)
@@ -285,7 +292,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         private async Task<dynamic> GetAllDocuments(string slug)
         {
             dynamic result = null;
-            HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{slug}");
+            string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}");
+            HttpResponseMessage response = await this._httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
                 string responseContent = await response.Content.ReadAsStringAsync();
@@ -333,7 +341,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             List<Workspace> workspaces = new List<Workspace>();
             try
             {
-                HttpResponseMessage response = await this._httpClient.GetAsync("/workspaces");
+                string url = UrlUtils.GetFullUrl(this._baseUrl, "/workspaces");
+                HttpResponseMessage response = await this._httpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     string responseContent = await response.Content.ReadAsStringAsync();
@@ -347,53 +356,14 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return this.WorkspaceRoot;
         }
-        public async Task<dynamic> GetChatsWorkspace(string slug)
+        public async Task<Workspace> CreateNewWorkspaceAsync(string workspaceName)
         {
-            dynamic objResult = null;
-            try
-            {
-                HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{slug}/chats");
-                if (response.IsSuccessStatusCode)
-                {
-                    string responseContent = await response.Content.ReadAsStringAsync();
-                    var responseJson = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                    objResult = new
-                    {
-                        Data = responseJson
-                    };
-                }
-                else
-                {
-                    objResult = new
-                    {
-                        Error = new
-                        {
-                            Message = "No se ha podido obtener respuesta"
-                        }
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                objResult = new
-                {
-                    Error = new
-                    {
-                        Message = ex.Message
-                    }
-                };
-            }
-
-            return objResult;
-        }
-        public async Task<dynamic> CreateNewWorkspace(string slug)
-        {
-            dynamic objResult = null;
+            Workspace workspace = null;
             try
             {
                 var payload = new
                 {
-                    name = slug,
+                    name = workspaceName,
                     similarityThreshold = 0.7,
                     openAiTemp = 0.7,
                     openAiHistory = 20,
@@ -406,42 +376,28 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 string jsonPayload = JsonConvert.SerializeObject(payload);
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await this._httpClient.PostAsync($"/workspace/new", content);
+                string url = UrlUtils.GetFullUrl(this._baseUrl, "/workspace/new");
+                HttpResponseMessage response = await this._httpClient.PostAsync(url, content);
                 if (response.IsSuccessStatusCode)
-                    objResult = new
-                    {
-                        Data = "Se ha creado el workspace"
-                    };
-                else
                 {
-                    objResult = new
-                    {
-                        Error = new
-                        {
-                            Message = "No se ha podido obtener respuesta"
-                        }
-                    };
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    workspace = JsonConvert.DeserializeObject<WorkspaceResponse>(responseContent).Workspace;
                 }
             }
             catch (Exception ex)
             {
-                objResult = new
-                {
-                    Error = new
-                    {
-                        Message = ex.Message
-                    }
-                };
+                workspace = null;
             }
 
-            return objResult;
+            return workspace;
         }
-        public async Task<dynamic> DeleteWorkspace(string slug)
+        public async Task<dynamic> DeleteWorkspaceAsync(string slug)
         {
             dynamic objResult = null;
             try
             {
-                HttpResponseMessage response = await this._httpClient.DeleteAsync($"/workspace/{slug}");
+                string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}");
+                HttpResponseMessage response = await this._httpClient.DeleteAsync(url);
                 if (response.IsSuccessStatusCode)
                     objResult = new
                     {
@@ -479,7 +435,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             try
             {
-                HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{workspaceSlug}/thread/{threadSlug}/chats");
+                string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{workspaceSlug}/thread/{threadSlug}/chats");
+                HttpResponseMessage response = await this._httpClient.GetAsync(url);
                 string responseContent = await response.Content.ReadAsStringAsync();
                 conversation = JsonConvert.DeserializeObject<ConversationHistory>(responseContent);
             }
@@ -490,49 +447,38 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return conversation;
         }
-        public async Task<dynamic> CreateNewThread(string slug)
+        public async Task<Models.Thread> CreateNewThread(string workspaceSlug, string threadName)
         {
-            dynamic objResult = null;
+            Models.Thread thread = null;
             try
             {
-                HttpResponseMessage response = await this._httpClient.GetAsync($"/workspace/{slug}/thread/new");
+                string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{workspaceSlug}/thread/new");
+
+                var payload = new{name=threadName};
+                string jsonPayload = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+                HttpResponseMessage response = await this._httpClient.PostAsync(url, content);
                 if (response.IsSuccessStatusCode)
                 {
-                    objResult = new
-                    {
-                        Data = "Se ha creado el hilo correctamente"
-                    };
-                }
-                else
-                {
-                    objResult = new
-                    {
-                        Error = new
-                        {
-                            Message = "No se ha podido obtener respuesta"
-                        }
-                    };
+                    string responseContent = await response.Content.ReadAsStringAsync();
+                    thread = JsonConvert.DeserializeObject<ThreadResponse>(responseContent).Thread;
                 }
             }
             catch (Exception ex)
             {
-                objResult = new
-                {
-                    Error = new
-                    {
-                        Message = ex.Message
-                    }
-                };
+                thread = null;
             }
 
-            return objResult;
+            return thread;
         }
         public async Task<dynamic> DeleteThread(string slug, string threadSlug)
         {
             dynamic objResult = null;
             try
             {
-                HttpResponseMessage response = await this._httpClient.DeleteAsync($"/workspace/{slug}/thread/{threadSlug}");
+                string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}/thread/{threadSlug}");
+                HttpResponseMessage response = await this._httpClient.DeleteAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     objResult = new

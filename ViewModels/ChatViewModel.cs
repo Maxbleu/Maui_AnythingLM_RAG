@@ -6,7 +6,6 @@ using MauiApp_AnyThingLM_RAG.Factory;
 using MauiApp_AnyThingLM_RAG.Managers;
 using MauiApp_AnyThingLM_RAG.Models;
 using MauiApp_AnyThingLM_RAG.Utils;
-using MauiApp_AnyThingLM_RAG.Views;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
 {
@@ -14,18 +13,27 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private ChatSettingsViewModel _chatSettingsViewModel;
+        private ObservableCollection<dynamic> _messages;
         private AnyThingLLManager _anyThingLLManager;
 
-        private ChatPage _chatPage;
-
         private string _newMessageText = "";
+        private string _theardName;
         private string _chatMode = "Chat";
         private string _slug;
-        private string _theardName;
 
-        public ObservableCollection<dynamic> Messages { get; set; }
+        public ObservableCollection<dynamic> Messages 
+        {
+            get => _messages;
+            set
+            {
+                if (_messages != value)
+                {
+                    _messages = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public Dictionary<string, List<string>> References { get; set; }
-
         public string NewMessageText
         {
             get => _newMessageText;
@@ -85,59 +93,39 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             this.Slug = slug;
             this.ThreadName = threadName;
 
+            this.Messages = new ObservableCollection<dynamic>();
+
             this.SendMessageCommand = new Command(SendMessageAsync);
             this.NavigateToChatSettingsCommand = new Command(NavigateToChatSettingsAsync);
-            this.ShowReferencesMetaDocumentCommand = new Command(ShowReferencesMetaDocument);
             this.NavigateToWorkspaceDocumentsCommand = new Command(NavigateToWorkspaceDocumentsAsync);
-
-            this.LoadConversation();
 
             this._chatSettingsViewModel = IPlatformApplication.Current.Services.GetService<ChatSettingsViewModel>();
             this._anyThingLLManager = IPlatformApplication.Current.Services.GetService<SettingsViewModel>().AnyThingLLManager;
+
+            this.LoadConversation();
         }
         public ChatViewModel() { }
 
         private async void LoadConversation()
         {
-            //  Obtener thread slug
-            string threadSlug = this._anyThingLLManager.WorkspaceRoot.Workspaces.Where(w => w.Threads.Where(t => t.Name == this.ThreadName).Any()).FirstOrDefault()?.ToString();
+            string threadSlug = this._anyThingLLManager.WorkspaceRoot.Workspaces.SelectMany(workspace => workspace.Threads).FirstOrDefault(thread => thread.Name == this.ThreadName)?.Slug;
 
-            //  Obtenemos mensajes
             ConversationHistory conversationHistory = await this._anyThingLLManager.GetThreadMessagesAsync(this.Slug, threadSlug);
 
             if(conversationHistory.History.Count > 0)
             {
+                this.Messages = new ObservableCollection<dynamic>();
                 foreach(MessageItem item in conversationHistory.History)
                 {
-                    dynamic obj = new
-                    {
-                        Text = item.Content,
-                        IsCurrentUser = item.Role == "user" ? true : false,
-                    };
-
-                    if (!obj.IsCurrentUser)
-                    {
-                        Dictionary<string, List<string>> reference = MessageReferenceUtils.GetReferenceDocument(item.Sources);
-                        obj["Keys"] = new ObservableCollection<string>(reference.Keys);
-                    }
-
-                    this.Messages.Add(obj);
+                    this.Messages.Add(
+                        new {
+                            Text = item.Content,
+                            IsCurrentUser = item.Role == "user" ? true : false,
+                            Keys = new ObservableCollection<string>(item.Role == "user" ? new List<string>() : MessageReferenceUtils.GetReferenceDocument(item.Sources).Keys.ToList())
+                        }
+                    );
                 }
             }
-        }
-
-        /// <summary>
-        /// Este método se encarga de mostrar las referencias
-        /// que ha encontrado el modelo en el documento para
-        /// realizar el mensaje que ha recibido el usuario
-        /// </summary>
-        /// <param name="sender"></param>
-        private void ShowReferencesMetaDocument(object sender)
-        {
-            //  Obtener las referencias del documento
-            
-
-            //  Mostrar las referencias en la vista
         }
         /// <summary>
         /// Este método se encarga de enviar
