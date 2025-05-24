@@ -106,6 +106,11 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         }
         public ChatViewModel() { }
 
+        /// <summary>
+        /// Este método se encarga de obtener
+        /// los mensajes de la conversación
+        /// y cargarlos en la parte gráfica.
+        /// </summary>
         private async void LoadConversation()
         {
             string threadSlug = this._anyThingLLManager.WorkspaceRoot.Workspaces.SelectMany(workspace => workspace.Threads).FirstOrDefault(thread => thread.Name == this.ThreadName)?.Slug;

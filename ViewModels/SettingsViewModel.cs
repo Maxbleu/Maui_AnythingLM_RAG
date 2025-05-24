@@ -138,12 +138,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         }
 
         public ICommand ReloadConfigurationCommand { get; }
-        public ICommand GoBackCommand { get; }
 
         public SettingsViewModel()
         {
             this.ReloadConfigurationCommand = new Command(ReloadConfigurationAsync);
-            this.GoBackCommand = new Command(GuiUtils.GoBackAsync);
         }
 
         /// <summary>

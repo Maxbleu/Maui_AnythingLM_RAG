@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
-using MauiApp_AnyThingLM_RAG.Utils;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
 {
@@ -49,11 +47,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             }
         }
 
-        public ICommand GoBackCommand { get; }
-        public ChatSettingsViewModel() 
-        {
-            this.GoBackCommand = new Command(GuiUtils.GoBackAsync);
-        }
+        public ChatSettingsViewModel() {}
 
         #region INotifyPropertyChanged
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>

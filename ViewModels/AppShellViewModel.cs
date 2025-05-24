@@ -6,8 +6,6 @@ using MauiApp_AnyThingLM_RAG.Factory;
 using MauiApp_AnyThingLM_RAG.Models;
 using MauiApp_AnyThingLM_RAG.Utils;
 using MauiApp_AnyThingLM_RAG.Views;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
 {
@@ -85,6 +83,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             Routing.RegisterRoute(nameof(SettingsPage), typeof(SettingsPage));
         }
 
+        //  EVENTOS SUBCRITOS
         private void AppShellViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(AppShellViewModel.WorkspaceRoot))
@@ -102,6 +101,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             }
         }
         
+        /// <summary>
+        /// Este método se encarga de cargar
+        /// el menu lateral de la aplicación.
+        /// </summary>
         private void LoadFlyoutMenu()
         {
             List<Expander> expanderItems = new List<Expander>();
@@ -146,6 +149,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 buttonAddThread.SetAppTheme<FileImageSource>(Image.SourceProperty, "add_thread_black.svg", "add_thread.svg");
                 var tapGestureAddThread = new TapGestureRecognizer();
                 tapGestureAddThread.SetBinding(TapGestureRecognizer.CommandProperty, "CreateThreadCommand");
+                tapGestureAddThread.CommandParameter = new
+                {
+                    WorkspaceSlug = workspace.Slug,
+                };
                 buttonAddThread.GestureRecognizers.Add(tapGestureAddThread);
 
                 var buttonDeleteWorkspace = new Image

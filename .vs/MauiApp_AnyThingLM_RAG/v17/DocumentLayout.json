@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:views\\homepage.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\managers\\anythingllmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:managers\\anythingllmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:mauiprogram.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|c:\\users\\juanf\\desktop\\repos\\maxbleu\\mauiapp_anythinglm_rag\\viewmodels\\appshellviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2D9944E6-C9B5-48CD-B035-FB80AEBE973F}|MauiApp_AnyThingLM_RAG.csproj|solutionrelative:viewmodels\\appshellviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,27 +30,28 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "MauiProgram.cs",
-              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\MauiProgram.cs",
-              "RelativeDocumentMoniker": "MauiProgram.cs",
-              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\MauiProgram.cs",
-              "RelativeToolTip": "MauiProgram.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAA2AAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "AnyThingLLManager.cs",
+              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Managers\\AnyThingLLManager.cs",
+              "RelativeDocumentMoniker": "Managers\\AnyThingLLManager.cs",
+              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Managers\\AnyThingLLManager.cs",
+              "RelativeToolTip": "Managers\\AnyThingLLManager.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAJMBAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-22T20:46:43.066Z"
+              "WhenOpened": "2025-05-24T20:54:59.503Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "HomePage.xaml",
-              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Views\\HomePage.xaml",
-              "RelativeDocumentMoniker": "Views\\HomePage.xaml",
-              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\Views\\HomePage.xaml",
-              "RelativeToolTip": "Views\\HomePage.xaml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-05-22T20:28:18.021Z",
+              "DocumentIndex": 1,
+              "Title": "AppShellViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\ViewModels\\AppShellViewModel.cs",
+              "RelativeDocumentMoniker": "ViewModels\\AppShellViewModel.cs",
+              "ToolTip": "C:\\Users\\juanf\\Desktop\\Repos\\Maxbleu\\MauiApp_AnyThingLM_RAG\\ViewModels\\AppShellViewModel.cs",
+              "RelativeToolTip": "ViewModels\\AppShellViewModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMkBAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-24T20:45:49.46Z",
               "EditorCaption": ""
             }
           ]

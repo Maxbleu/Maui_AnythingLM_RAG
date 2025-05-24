@@ -1,7 +1,5 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
 using MauiApp_AnyThingLM_RAG.Models;
 using MauiApp_AnyThingLM_RAG.Utils;
 using MauiApp_IA_IOT.Util;
@@ -29,6 +27,18 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         }
 
         //  CHAT
+        /// <summary>
+        /// Este método se encarga de enviar un
+        /// mensaje del usuario a la ia para
+        /// obtener la respuesta de la ia
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="systemPrompt"></param>
+        /// <param name="temperature"></param>
+        /// <param name="maxTokens"></param>
+        /// <param name="chatMode"></param>
+        /// <param name="slug"></param>
+        /// <returns></returns>
         public async Task<dynamic> SendMessageAsync(string message, string systemPrompt, double temperature, string maxTokens, string chatMode, string slug)
         {
             dynamic objResult = null;
@@ -76,6 +86,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return objResult;
         }
+        /// <summary>
+        /// Este método se encarga de 
+        /// obtener la información de 
+        /// los chuncks
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
         private async Task<dynamic> GetInfoChunks(HttpResponseMessage response)
         {
             string responseContent = await response.Content.ReadAsStringAsync();
@@ -98,6 +115,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         }
 
         //  DOCUMENT
+
         public async Task<dynamic> TakeDocumentAsync(string slug)
         {
             dynamic result = null;
@@ -218,6 +236,14 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return moveResponse.IsSuccessStatusCode;
         }
+        /// <summary>
+        /// Este método se encarga de subir
+        /// un fichero aportado por el usuario
+        /// a un workspace espifico
+        /// </summary>
+        /// <param name="fileResult"></param>
+        /// <param name="slug"></param>
+        /// <returns></returns>
         private async Task<dynamic> UploadDocument(FileResult fileResult, string slug)
         {
             string originalFileName = fileResult.FileName;
@@ -255,6 +281,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 }
             }
         }
+        /// <summary>
+        /// Este método se encarga de actualizar el
+        /// embedding cuando subimos un fichero al rag
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="slug"></param>
+        /// <returns></returns>
         private async Task<bool> UpdateEmbeddings(string fileName, string slug)
         {
             var updatePayload = new
@@ -270,6 +303,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             HttpResponseMessage updateResponse = await this._httpClient.PostAsync(url, updateContent);
             return updateResponse.IsSuccessStatusCode;
         }
+        /// <summary>
+        /// Este método se encarga de obtener
+        /// todos los documentos del workspace
+        /// especifico anteriormente
+        /// </summary>
+        /// <param name="slug"></param>
+        /// <returns></returns>
         public async Task<dynamic> TakeWorkspaceDocumentsAsync(string slug)
         {
             dynamic result = null;
@@ -289,6 +329,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             }
             return result;
         }
+        
         private async Task<dynamic> GetAllDocuments(string slug)
         {
             dynamic result = null;
@@ -336,6 +377,11 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         }
     
         //  WORKSPACES
+        /// <summary>
+        /// Este método se encarga de obtener
+        /// todos los workspaces de anythingllm
+        /// </summary>
+        /// <returns></returns>
         public async Task<WorkspaceRoot> GetAllWorkSpaces()
         {
             List<Workspace> workspaces = new List<Workspace>();
@@ -356,6 +402,12 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return this.WorkspaceRoot;
         }
+        /// <summary>
+        /// Este método se encarga de crear un
+        /// nuevo workspace en anythingllm
+        /// </summary>
+        /// <param name="workspaceName"></param>
+        /// <returns></returns>
         public async Task<Workspace> CreateNewWorkspaceAsync(string workspaceName)
         {
             Workspace workspace = null;
@@ -391,6 +443,12 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return workspace;
         }
+        /// <summary>
+        /// Este método se encarga de eliminar
+        /// un workspace específico de anythingllm
+        /// </summary>
+        /// <param name="slug"></param>
+        /// <returns></returns>
         public async Task<dynamic> DeleteWorkspaceAsync(string slug)
         {
             dynamic objResult = null;
@@ -429,6 +487,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         }
 
         //  THREAD
+        /// <summary>
+        /// Este método se encarga de obtener los mensajes 
+        /// mensajes del thread de un workspace específico
+        /// </summary>
+        /// <param name="workspaceSlug"></param>
+        /// <param name="threadSlug"></param>
+        /// <returns></returns>
         public async Task<ConversationHistory>? GetThreadMessagesAsync(string workspaceSlug, string threadSlug)
         {
             ConversationHistory conversation = null;
@@ -447,6 +512,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return conversation;
         }
+        /// <summary>
+        /// Este método se encarga de crear
+        /// un thread en un workspace específico
+        /// </summary>
+        /// <param name="workspaceSlug"></param>
+        /// <param name="threadName"></param>
+        /// <returns></returns>
         public async Task<Models.Thread> CreateNewThread(string workspaceSlug, string threadName)
         {
             Models.Thread thread = null;
@@ -472,6 +544,14 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             return thread;
         }
+        /// <summary>
+        /// Este método se encarga de 
+        /// eliminar un thread de un workspace
+        /// específico
+        /// </summary>
+        /// <param name="slug"></param>
+        /// <param name="threadSlug"></param>
+        /// <returns></returns>
         public async Task<dynamic> DeleteThread(string slug, string threadSlug)
         {
             dynamic objResult = null;

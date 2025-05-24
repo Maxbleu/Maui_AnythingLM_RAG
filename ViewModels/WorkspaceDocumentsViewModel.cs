@@ -29,12 +29,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             }
         }
 
-        public ICommand GoBackCommand { get; }
         public ICommand UploadDocumentCommand { get; }
 
         public WorkspaceDocumentsViewModel(List<Metadata> documents, string slug)
         {
-            this.GoBackCommand = new Command(GuiUtils.GoBackAsync);
             this.UploadDocumentCommand = new Command(UploadDocumentAsync);
 
             this.Slug = slug;
@@ -72,7 +70,6 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
             }
             GuiUtils.SendSnakbarMessage(message);
         }
-
 
         #region INotifyPropertyChanged
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>

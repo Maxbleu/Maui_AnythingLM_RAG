@@ -4,19 +4,114 @@
         <name>MauiApp_AnyThingLM_RAG</name>
     </assembly>
     <members>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.SendMessageAsync(System.String,System.String,System.Double,System.String,System.String,System.String)">
+            <summary>
+            Este método se encarga de enviar un
+            mensaje del usuario a la ia para
+            obtener la respuesta de la ia
+            </summary>
+            <param name="message"></param>
+            <param name="systemPrompt"></param>
+            <param name="temperature"></param>
+            <param name="maxTokens"></param>
+            <param name="chatMode"></param>
+            <param name="slug"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.GetInfoChunks(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Este método se encarga de 
+            obtener la información de 
+            los chuncks
+            </summary>
+            <param name="response"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.UploadDocument(Microsoft.Maui.Storage.FileResult,System.String)">
+            <summary>
+            Este método se encarga de subir
+            un fichero aportado por el usuario
+            a un workspace espifico
+            </summary>
+            <param name="fileResult"></param>
+            <param name="slug"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.UpdateEmbeddings(System.String,System.String)">
+            <summary>
+            Este método se encarga de actualizar el
+            embedding cuando subimos un fichero al rag
+            </summary>
+            <param name="fileName"></param>
+            <param name="slug"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.TakeWorkspaceDocumentsAsync(System.String)">
+            <summary>
+            Este método se encarga de obtener
+            todos los documentos del workspace
+            especifico anteriormente
+            </summary>
+            <param name="slug"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.GetAllWorkSpaces">
+            <summary>
+            Este método se encarga de obtener
+            todos los workspaces de anythingllm
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.CreateNewWorkspaceAsync(System.String)">
+            <summary>
+            Este método se encarga de crear un
+            nuevo workspace en anythingllm
+            </summary>
+            <param name="workspaceName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.DeleteWorkspaceAsync(System.String)">
+            <summary>
+            Este método se encarga de eliminar
+            un workspace específico de anythingllm
+            </summary>
+            <param name="slug"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.GetThreadMessagesAsync(System.String,System.String)">
+            <summary>
+            Este método se encarga de obtener los mensajes 
+            mensajes del thread de un workspace específico
+            </summary>
+            <param name="workspaceSlug"></param>
+            <param name="threadSlug"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.CreateNewThread(System.String,System.String)">
+            <summary>
+            Este método se encarga de crear
+            un thread en un workspace específico
+            </summary>
+            <param name="workspaceSlug"></param>
+            <param name="threadName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.Managers.AnyThingLLManager.DeleteThread(System.String,System.String)">
+            <summary>
+            Este método se encarga de 
+            eliminar un thread de un workspace
+            específico
+            </summary>
+            <param name="slug"></param>
+            <param name="threadSlug"></param>
+            <returns></returns>
+        </member>
         <member name="M:MauiApp_AnyThingLM_RAG.Utils.GuiUtils.SendSnakbarMessage(System.String)">
             <summary>
             Este método se encarga de mostrar mensajes
             a partir del Sankbar
             </summary>
             <param name="message"></param>
-        </member>
-        <member name="M:MauiApp_AnyThingLM_RAG.Utils.GuiUtils.GoBackAsync">
-            <summary>
-            Este método se encarga de 
-            volver a la página anterior
-            en la que se encontraba el usuario
-            </summary>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.Utils.GuiUtils.DisplayAlertAsync(Microsoft.Maui.Controls.Page,System.String,System.String,System.String,System.String)">
             <summary>
@@ -43,6 +138,12 @@
             <param name="textOkButton"></param>
             <param name="textCancelButton"></param>
             <returns></returns>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.LoadFlyoutMenu">
+            <summary>
+            Este método se encarga de cargar
+            el menu lateral de la aplicación.
+            </summary>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.AppShellViewModel.OpenChatAsync(System.Object)">
             <summary>
@@ -92,6 +193,13 @@
             <summary>
             Este método se encarga de navegar desde la página en la
             que me encuentre hasta la página settings
+            </summary>
+        </member>
+        <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.LoadConversation">
+            <summary>
+            Este método se encarga de obtener
+            los mensajes de la conversación
+            y cargarlos en la parte gráfica.
             </summary>
         </member>
         <member name="M:MauiApp_AnyThingLM_RAG.ViewModels.ChatViewModel.SendMessageAsync">
