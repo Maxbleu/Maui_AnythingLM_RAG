@@ -188,8 +188,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 
             if (objResult.GetType().GetProperty("Data") != null)
             {
-                WorkspaceDocumentsViewModel workspaceDocumentsViewModel = WorkspaceDocumentsViewModelFactory.Create(objResult.Data, this.Slug);
-                await Shell.Current.Navigation.PushAsync(WorkspaceDocumentsPageFactory.Create(workspaceDocumentsViewModel));
+                List<Source> sources = (List<Source>)objResult.Data;
+                WorkspaceDocumentsViewModel workspaceDocumentsViewModel = WorkspaceDocumentsViewModelFactory.Create(sources, this.Slug);
+                WorkspaceDocumentsPage workspaceDocumentsPage = WorkspaceDocumentsPageFactory.Create(workspaceDocumentsViewModel);
+                await Shell.Current.Navigation.PushAsync(workspaceDocumentsPage);
             }
             else
             {

@@ -116,9 +116,9 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
         //  DOCUMENT
 
-        public async Task<dynamic> TakeDocumentAsync(string slug)
+        public async Task<Source> TakeDocumentAsync(string slug)
         {
-            dynamic result = null;
+            Source document = null;
             try
             {
                 var fileResult = await FilePicker.PickAsync(new PickOptions
@@ -137,17 +137,16 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                     string filePath = fileResult.FullPath;
 
                     // 1. Subir el documento
-                    Source document = await UploadDocument(new FileResult(filePath), slug);
+                    await Task.Delay(3000);
+                    document = await UploadDocument(new FileResult(filePath), slug);
                     if (document == null)
                     {
-                        result = new
-                        {
-                            Error = new
-                            {
-                                Message = "El documento no se ha podido subir. Inténtelo de nuevo."
-                            }
-                        };
-                        return result;
+                        GuiUtils.SendSnakbarMessage("El documento no se ha podido subir. Inténtelo de nuevo.");
+                        return document;
+                    }
+                    else
+                    {
+                        GuiUtils.SendSnakbarMessage("El documento se ha podido subir con éxito.");
                     }
 
                     string location = document.Location;
@@ -155,64 +154,40 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                     string fileName = location.Substring(location.LastIndexOf('/') + 1);
 
                     // 2. Mover el documento al workspace.
+                    await Task.Delay(3000);
                     bool moved = await MoveDocument(location, fileName);
                     if (!moved)
                     {
-                        result = new
-                        {
-                            Error = new
-                            {
-                                Message = "El documento no ha sido movido al workspace"
-                            }
-                        };
-                        return result;
-                    }
-
-                    // 3. Actualizar embeddings
-                    bool updated = await UpdateEmbeddings(fileName, slug);
-                    if (updated)
-                    {
-                        result = new
-                        {
-                            Response = new
-                            {
-                                Message = "El embedding ha sido modificado con éxito!"
-                            }
-                        };
+                        GuiUtils.SendSnakbarMessage("El documento no ha sido movido al workspace");
+                        return document;
                     }
                     else
                     {
-                        result = new
-                        {
-                            Error = new
-                            {
-                                Message = "El embedding no ha podido ser modificado."
-                            }
-                        };
+                        GuiUtils.SendSnakbarMessage("El documento se ha sido movido al workspace.");
+                    }
+
+                    // 3. Actualizar embeddings
+                    await Task.Delay(3000);
+                    bool updated = await UpdateEmbeddings(fileName, slug);
+                    if (updated)
+                    {
+                        GuiUtils.SendSnakbarMessage("El embedding ha sido modificado con éxito!");
+                    }
+                    else
+                    {
+                        GuiUtils.SendSnakbarMessage("El embedding no ha podido ser modificado.");
                     }
                 }
                 else
                 {
-                    result = new
-                    {
-                        Error = new
-                        {
-                            Message = "No se ha seleccionado ningún documento"
-                        }
-                    };
+                    GuiUtils.SendSnakbarMessage("No se ha seleccionado ningún documento");
                 }
             }
             catch (Exception ex)
             {
-                result = new
-                {
-                    Error = new
-                    {
-                        Message = ex.Message
-                    }
-                };
+                GuiUtils.SendSnakbarMessage(ex.Message);
             }
-            return result;
+            return document;
         }
         private async Task<bool> MoveDocument(string location, string toName)
         {
@@ -344,6 +319,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         {
             dynamic result = null;
             string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}");
+
             HttpResponseMessage response = await this._httpClient.GetAsync(url);
             if (response.IsSuccessStatusCode)
             {
@@ -357,11 +333,11 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 Workspace workspace = this.WorkspaceRoot.Workspaces.Where(w => w.Slug == slug).FirstOrDefault();
 
                 //  Obtenemos la lista de documentos
-                List<Metadata> documents = new List<Metadata>();
+                List<Source> documents = new List<Source>();
                 foreach(Document doc in workspace.Documents)
                 {
                     //  Obtenemos los metadatos del documento
-                    var metadata = JsonConvert.DeserializeObject<Metadata>(doc.Metadata);
+                    var metadata = JsonConvert.DeserializeObject<Source>(doc.Metadata);
 
                     //  Añadimos el documento a la lista
                     documents.Add(metadata);

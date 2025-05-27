@@ -12,10 +12,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private AnyThingLLManager _anyThingLLManager;
-        private ObservableCollection<Metadata> _documents;
+        private ObservableCollection<Source> _documents = new ObservableCollection<Source>();
         private string _slug;
 
-        public ObservableCollection<Metadata> Documents 
+        public ObservableCollection<Source> Documents 
         {
             get => this._documents;
             set
@@ -23,7 +23,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 if(this._documents != value)
                 {
                     this._documents = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Documents));
                 }
             }
         }
@@ -42,15 +42,17 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 
         public ICommand UploadDocumentCommand { get; }
 
-        public WorkspaceDocumentsViewModel(List<Metadata> documents, string slug)
+        public WorkspaceDocumentsViewModel(List<Source> documents, string slug)
         {
             this.Slug = slug;
-            this.Documents = new ObservableCollection<Metadata>(documents);
+            this.AddNewDocuments(documents);
 
             this.UploadDocumentCommand = new Command(UploadDocumentAsync);
 
             this._anyThingLLManager = IPlatformApplication.Current.Services.GetService<SettingsViewModel>().AnyThingLLManager;
         }
+
+        public WorkspaceDocumentsViewModel() { }
 
         /// <summary>
         /// Este método se encarga de enviar un documento
@@ -58,28 +60,28 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         /// </summary>
         private async void UploadDocumentAsync()
         {
-            string message = "";
-            dynamic objResult = await this._anyThingLLManager.TakeDocumentAsync(this.Slug);
-            if (objResult.GetType().GetProperty("Response") != null)
+            Source source = await this._anyThingLLManager.TakeDocumentAsync(this.Slug);
+            GuiUtils.SendSnakbarMessage("Se ha obtenido el documento");
+            await Task.Delay(10000);
+            if (source != null)
             {
-                message = objResult.Response.Message;
-                await Task.Delay(2000);
+                List<Source> sources = this.Documents.ToList<Source>();
+                sources.Add(source);
 
-                dynamic documents = await this._anyThingLLManager.TakeWorkspaceDocumentsAsync(this.Slug);
-                if (documents.GetType().GetProperty("Data") != null)
-                {
-                    this.Documents = new ObservableCollection<Metadata>(documents.Data);
-                }
-                else
-                {
-                    message = objResult.Error.Message;
-                }
+                AddNewDocuments(sources);
             }
-            else
+        }
+
+        private void AddNewDocuments(List<Source> documents)
+        {
+            if (documents != null && documents.Count > 0)
             {
-                message = objResult.Error.Message;
+                this.Documents.Clear();
+                foreach (Source document in documents)
+                {
+                    this.Documents.Add(document);
+                }
             }
-            GuiUtils.SendSnakbarMessage(message);
         }
 
         #region INotifyPropertyChanged
