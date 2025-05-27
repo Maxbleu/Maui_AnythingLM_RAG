@@ -14,6 +14,7 @@
         public int TokenCountEstimate { get; set; }
         public string Text { get; set; }
         public double _Distance { get; set; }
+        public string Location { get; set; }
         public double Score { get; set; }
     }
 }

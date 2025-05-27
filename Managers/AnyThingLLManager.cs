@@ -19,7 +19,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         {
             this._httpClient = new HttpClient
             {
-                Timeout = TimeSpan.FromSeconds(10)
+                Timeout = TimeSpan.FromSeconds(60)
             };
             this._baseUrl = baseUrl;
             this._httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
@@ -137,7 +137,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                     string filePath = fileResult.FullPath;
 
                     // 1. Subir el documento
-                    dynamic document = await UploadDocument(new FileResult(filePath), slug);
+                    Source document = await UploadDocument(new FileResult(filePath), slug);
                     if (document == null)
                     {
                         result = new
@@ -150,8 +150,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                         return result;
                     }
 
-                    string location = document.location;
-                    string title = document.title;
+                    string location = document.Location;
+                    string title = document.Title;
                     string fileName = location.Substring(location.LastIndexOf('/') + 1);
 
                     // 2. Mover el documento al workspace.
@@ -232,7 +232,8 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             string moveJson = JsonConvert.SerializeObject(movePayload);
             var moveContent = new StringContent(moveJson, Encoding.UTF8, "application/json");
-            HttpResponseMessage moveResponse = await this._httpClient.PostAsync($"/document/move-files", moveContent);
+            string url = UrlUtils.GetFullUrl(this._baseUrl, "/document/move-files");
+            HttpResponseMessage moveResponse = await this._httpClient.PostAsync(url, moveContent);
 
             return moveResponse.IsSuccessStatusCode;
         }
@@ -244,7 +245,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
         /// <param name="fileResult"></param>
         /// <param name="slug"></param>
         /// <returns></returns>
-        private async Task<dynamic> UploadDocument(FileResult fileResult, string slug)
+        private async Task<Source> UploadDocument(FileResult fileResult, string slug)
         {
             string originalFileName = fileResult.FileName;
 
@@ -252,6 +253,7 @@ namespace MauiApp_AnyThingLM_RAG.Managers
 
             form.Add(new StringContent(slug), "slug");
 
+            Source document = null;
             using (Stream fileStream = await fileResult.OpenReadAsync())
             {
                 // Lee los bytes desde el Stream
@@ -271,15 +273,13 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                     if (uploadResponse.IsSuccessStatusCode)
                     {
                         string uploadResult = await uploadResponse.Content.ReadAsStringAsync();
-                        dynamic uploadJson = JsonConvert.DeserializeObject(uploadResult);
-                        return uploadJson.documents[0];
-                    }
-                    else
-                    {
-                        return null;
+                        UploadResponse uploadJson = JsonConvert.DeserializeObject<UploadResponse>(uploadResult);
+                        List<Source> documents = uploadJson.documents;
+                        document = documents[0];
                     }
                 }
             }
+            return document;
         }
         /// <summary>
         /// Este método se encarga de actualizar el
@@ -296,12 +296,23 @@ namespace MauiApp_AnyThingLM_RAG.Managers
                 deletes = new string[0]
             };
 
-            string updateJson = JsonConvert.SerializeObject(updatePayload);
-            var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
+            bool result = false;
+            try
+            {
+                string updateJson = JsonConvert.SerializeObject(updatePayload);
+                var updateContent = new StringContent(updateJson, Encoding.UTF8, "application/json");
+                string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}/update-embeddings");
+                HttpResponseMessage updateResponse = await this._httpClient.PostAsync(url, updateContent); 
+                if (updateResponse.IsSuccessStatusCode)
+                {
+                    result = updateResponse.IsSuccessStatusCode;
+                }
+            }catch (Exception ex)
+            {
+                result = false;
+            }
 
-            string url = UrlUtils.GetFullUrl(this._baseUrl, $"/workspace/{slug}/update-embeddings");
-            HttpResponseMessage updateResponse = await this._httpClient.PostAsync(url, updateContent);
-            return updateResponse.IsSuccessStatusCode;
+            return result;
         }
         /// <summary>
         /// Este método se encarga de obtener
@@ -329,7 +340,6 @@ namespace MauiApp_AnyThingLM_RAG.Managers
             }
             return result;
         }
-        
         private async Task<dynamic> GetAllDocuments(string slug)
         {
             dynamic result = null;

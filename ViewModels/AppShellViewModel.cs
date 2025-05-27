@@ -254,13 +254,11 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 }
                 else
                 {
-                    // Mostrar un mensaje si no hay hilos
                     contentLayout.Children.Add(new Label
                     {
                         Text = "No hay hilos en este workspace",
                         HorizontalOptions = LayoutOptions.Center,
-                        Margin = new Thickness(0, 10, 0, 10),
-                        TextColor = Colors.White
+                        Margin = new Thickness(0, 10, 0, 10)
                     });
                 }
 

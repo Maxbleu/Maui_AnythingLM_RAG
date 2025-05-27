@@ -17,10 +17,11 @@ namespace MauiApp_AnyThingLM_RAG
                 fonts.AddFont("FerroRosso.ttf", "FerroRosso");
             }).UseMauiCommunityToolkit();
 
-            builder.Services.AddTransient<ChatSettingsViewModel>();
-
             builder.Services.AddSingleton<SettingsViewModel>();
             builder.Services.AddSingleton<SettingsPage>();
+
+            builder.Services.AddTransient<ChatSettingsViewModel>();
+            builder.Services.AddTransient<ChatSettingsPage>();
 
             builder.Services.AddTransient<ChatViewModel>();
             builder.Services.AddTransient<ChatPage>();
@@ -28,6 +29,7 @@ namespace MauiApp_AnyThingLM_RAG
             builder.Services.AddSingleton<HomePage>();
             
             builder.Services.AddSingleton<AppShellViewModel>();
+            builder.Services.AddSingleton<AppShell>();
 
 #if DEBUG
             builder.Logging.AddDebug();

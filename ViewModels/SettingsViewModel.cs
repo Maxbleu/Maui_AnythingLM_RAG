@@ -11,16 +11,13 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {
+        private const string ANYTHIGLLMF1API = "https://f1-analisys-anything-llm.up.railway.app";
         public event PropertyChangedEventHandler? PropertyChanged;
         private AnyThingLLManager _anyThingLLManager;
 
         private Brush _colorAnyThingLM = Brush.Red;
-        private string _protocol = "http";
-        private string _host = "192.168.1.150";
-        private string _port = "3001";
-        private string _apiKey = "GKYQ7MW-9N6M23A-M2E4ASX-ZYTNMJ8";
+        private string _apiKey = "6FMQV95-2HQMN0A-G37Z9R2-JG35S35";
         private string _baseUrl = "";
-
         private bool _isEnabledButton = true;
         private bool _isAnyThingLMRunning = false;
 
@@ -32,42 +29,6 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 if (this._colorAnyThingLM != value)
                 {
                     this._colorAnyThingLM = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public string Protocol
-        {
-            get => this._protocol;
-            set
-            {
-                if (this._protocol != value)
-                {
-                    this._protocol = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public string Host
-        {
-            get => this._host;
-            set
-            {
-                if (this._host != value)
-                {
-                    this._host = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public string Port
-        {
-            get => this._port;
-            set
-            {
-                if (this._port != value)
-                {
-                    this._port = value;
                     OnPropertyChanged();
                 }
             }
@@ -88,7 +49,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         {
             get
             {
-                string baseUrl = UrlUtils.GetBaseUrl(this.Protocol, this.Host, this.Port, "/api/v1");
+                string baseUrl = UrlUtils.GetBaseUrl(ANYTHIGLLMF1API, "/api/v1");
                 if (baseUrl != this._baseUrl)
                 {
                     this._baseUrl = baseUrl;

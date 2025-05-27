@@ -26,7 +26,7 @@
                    Text="Conectese al servicio de AnythingLLM para poder trabajar con los workspaces"
                    FontAttributes="Bold" />
 
-            <Label Grid.Row="0" x:Name="labelNoThereAreWorkspaces"
+            <Label Grid.Row="0" x:Name="labelNoThereAreWorkspaces" 
                    Text="No hay workspaces creados. Si desea crear uno pulse en el boton de abajo. 'Añadir workspace'"
                    FontAttributes="Bold" IsVisible="False" HorizontalOptions="Center"/>
 

@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Maui.Alerts;
-
-namespace MauiApp_IA_IOT.Util
+﻿namespace MauiApp_IA_IOT.Util
 {
     public static class UrlUtils
     {
@@ -12,9 +10,9 @@ namespace MauiApp_IA_IOT.Util
         /// <param name="ip"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public static string GetBaseUrl(string protocol, string ip, string port, string pathApi)
+        public static string GetBaseUrl(string f1api, string pathApi)
         {
-            return $"{protocol}://{ip}:{port}{pathApi}";
+            return $"{f1api}{pathApi}";
         }
 
         /// <summary>

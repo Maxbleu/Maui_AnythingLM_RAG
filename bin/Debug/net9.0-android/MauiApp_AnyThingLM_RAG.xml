@@ -256,7 +256,7 @@
             Exposes the Android Resource designer assembly into the project Namespace.
             </summary>
         </member>
-        <member name="M:MauiApp_IA_IOT.Util.UrlUtils.GetBaseUrl(System.String,System.String,System.String,System.String)">
+        <member name="M:MauiApp_IA_IOT.Util.UrlUtils.GetBaseUrl(System.String,System.String)">
             <summary>
             Este método se encarga de volver la base url resultado
             de la concatenación de los string que recibe por parámtro

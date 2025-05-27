@@ -12,10 +12,21 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private AnyThingLLManager _anyThingLLManager;
-
+        private ObservableCollection<Metadata> _documents;
         private string _slug;
 
-        public ObservableCollection<Metadata> Documents { get; set; }
+        public ObservableCollection<Metadata> Documents 
+        {
+            get => this._documents;
+            set
+            {
+                if(this._documents != value)
+                {
+                    this._documents = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public string Slug
         {
             get => this._slug;
@@ -33,10 +44,10 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
 
         public WorkspaceDocumentsViewModel(List<Metadata> documents, string slug)
         {
-            this.UploadDocumentCommand = new Command(UploadDocumentAsync);
-
             this.Slug = slug;
             this.Documents = new ObservableCollection<Metadata>(documents);
+
+            this.UploadDocumentCommand = new Command(UploadDocumentAsync);
 
             this._anyThingLLManager = IPlatformApplication.Current.Services.GetService<SettingsViewModel>().AnyThingLLManager;
         }
@@ -55,9 +66,9 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
                 await Task.Delay(2000);
 
                 dynamic documents = await this._anyThingLLManager.TakeWorkspaceDocumentsAsync(this.Slug);
-                if (!objResult.GetType().GetProperty("Error"))
+                if (documents.GetType().GetProperty("Data") != null)
                 {
-                    this.Documents = new ObservableCollection<Metadata>(objResult.Data);
+                    this.Documents = new ObservableCollection<Metadata>(documents.Data);
                 }
                 else
                 {

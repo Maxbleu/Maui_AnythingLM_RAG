@@ -6,6 +6,7 @@ using MauiApp_AnyThingLM_RAG.Factory;
 using MauiApp_AnyThingLM_RAG.Managers;
 using MauiApp_AnyThingLM_RAG.Models;
 using MauiApp_AnyThingLM_RAG.Utils;
+using MauiApp_AnyThingLM_RAG.Views;
 
 namespace MauiApp_AnyThingLM_RAG.ViewModels
 {
@@ -202,8 +203,7 @@ namespace MauiApp_AnyThingLM_RAG.ViewModels
         /// </summary>
         private async void NavigateToChatSettingsAsync()
         {
-            ChatSettingsViewModel chatSettingsViewModel = IPlatformApplication.Current.Services.GetService<ChatSettingsViewModel>();
-            await Shell.Current.Navigation.PushAsync(ChatSettingsPageFactory.Create(chatSettingsViewModel));
+            await Shell.Current.Navigation.PushAsync(IPlatformApplication.Current.Services.GetService<ChatSettingsPage>());
         }
         #region INotifyPropertyChanged
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>

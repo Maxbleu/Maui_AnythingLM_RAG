@@ -12,8 +12,7 @@ namespace MauiApp_AnyThingLM_RAG
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            AppShellViewModel appShellViewModel = IPlatformApplication.Current.Services.GetService<AppShellViewModel>();
-            AppShell appShell = AppShellFactory.Create(appShellViewModel);
+            AppShell appShell = IPlatformApplication.Current.Services.GetService<AppShell>();
 
             return new Window(appShell);
         }
